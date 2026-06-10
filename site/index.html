@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>尿酸记录 - 简洁的尿酸检测记录工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            font-size: 60px;
+        }
+        h1 {
+            font-size: 48px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .tagline {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        .download-btn {
+            background: white;
+            color: #667eea;
+            padding: 16px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 18px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .features {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 60px;
+            color: #2d3748;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        .feature-card {
+            background: #f7fafc;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .feature-card h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #2d3748;
+        }
+        .feature-card p {
+            color: #718096;
+            line-height: 1.8;
+        }
+        .highlights {
+            background: #f7fafc;
+            padding: 80px 20px;
+        }
+        .highlights-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .highlights h2 {
+            font-size: 36px;
+            margin-bottom: 40px;
+            color: #2d3748;
+        }
+        .highlight-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .highlight-item {
+            background: white;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 500;
+            color: #4a5568;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .footer-links {
+            margin-bottom: 20px;
+        }
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            margin: 0 20px;
+            transition: color 0.3s;
+        }
+        .footer-links a:hover {
+            color: white;
+        }
+        .footer p {
+            color: #718096;
+            font-size: 14px;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 36px;
+            }
+            .tagline {
+                font-size: 18px;
+            }
+            .features h2,
+            .highlights h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="app-icon">💧</div>
+        <h1>尿酸记录</h1>
+        <p class="tagline">简洁、免费的尿酸检测记录工具。追踪您的尿酸趋势，管理健康生活。</p>
+        <a href="#" class="download-btn">App Store 下载</a>
+    </section>
+
+    <section class="features">
+        <h2>功能特点</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>快速记录</h3>
+                <p>简洁的界面设计，几秒钟完成尿酸检测值记录，支持 μmol/L 和 mg/dL 两种单位。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>趋势图表</h3>
+                <p>直观的可视化图表，帮助您追踪尿酸变化趋势，了解健康状况。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">☁️</div>
+                <h3>iCloud 同步</h3>
+                <p>可选的 iCloud 同步功能，在您的所有 Apple 设备间安全同步数据。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📤</div>
+                <h3>数据导出</h3>
+                <p>支持 CSV 格式导出，方便数据备份和与医生分享。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>参考范围</h3>
+                <p>根据性别显示个性化的正常参考范围，帮助您了解检测结果。</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>隐私保护</h3>
+                <p>本地优先存储，无需注册，您的健康数据完全由您掌控。</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="highlights">
+        <div class="highlights-content">
+            <h2>为什么选择尿酸记录</h2>
+            <div class="highlight-list">
+                <span class="highlight-item">✓ 完全免费</span>
+                <span class="highlight-item">✓ 无广告</span>
+                <span class="highlight-item">✓ 极简设计</span>
+                <span class="highlight-item">✓ 无需注册</span>
+                <span class="highlight-item">✓ 离线使用</span>
+                <span class="highlight-item">✓ 数据安全</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a href="privacy-policy.html">隐私政策</a>
+            <a href="mailto:lq.so@qq.com">联系我们</a>
+        </div>
+        <p>© 2026 尿酸记录. 保留所有权利。</p>
+    </footer>
+</body>
+</html>
