@@ -55,9 +55,9 @@ enum UserGender: String, CaseIterable, Identifiable, Codable {
 	var normalRangeUpper: Double {
 		switch self {
 		case .male:
-			return 420
+			return 428
 		case .female:
-			return 360
+			return 357
 		}
 	}
 	
@@ -65,9 +65,9 @@ enum UserGender: String, CaseIterable, Identifiable, Codable {
 	var normalRangeLower: Double {
 		switch self {
 		case .male:
-			return 210
+			return 208
 		case .female:
-			return 150
+			return 155
 		}
 	}
 	
@@ -115,4 +115,3 @@ enum TimeRange: String, CaseIterable, Identifiable {
 		}
 	}
 }
-

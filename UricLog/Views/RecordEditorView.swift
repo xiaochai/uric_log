@@ -148,6 +148,7 @@ struct RecordEditorView: View {
                     Image(systemName: "questionmark.circle")
                         .foregroundStyle(.secondary)
                 }
+				.accessibilityLabel("来源与引用")
             }
             
             // 当前性别对应的正常范围
@@ -163,6 +164,9 @@ struct RecordEditorView: View {
                 Text(userGender.normalRangeText(unit: selectedUnit))
                     .font(.system(size: 20, weight: .semibold, design: .rounded))
                     .foregroundStyle(.cyan)
+			Text("来源与引用：点击右上角 ? 查看")
+				.font(.caption)
+				.foregroundStyle(.secondary)
             }
             .padding()
             .background(
@@ -406,19 +410,15 @@ struct ReferenceInfoSheet: View {
                     // 正常范围
                     normalRangeSection
                     
-                    // 诊断标准
-                    diagnosisSection
-                    
-                    // 痛风控制目标
-                    goutControlSection
-                    
                     // 注意事项
                     noticeSection
+					
+					sourcesSection
                 }
                 .padding()
             }
             .background(Color(.systemGroupedBackground))
-            .navigationTitle("尿酸参考值说明")
+			.navigationTitle("参考信息")
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -444,6 +444,9 @@ struct ReferenceInfoSheet: View {
                 Text("常用单位：μmol/L（也常用 mg/dL）")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+				Text("该换算基于尿酸分子量与单位换算，来源见下方「来源与引用」。")
+					.font(.caption)
+					.foregroundStyle(.secondary)
             }
             .padding()
             .background(
@@ -458,30 +461,28 @@ struct ReferenceInfoSheet: View {
             HStack {
                 Image(systemName: "person.2.fill")
                     .foregroundStyle(.green)
-                Text("血尿酸正常范围（空腹、成人）")
+				Text("常见参考范围（空腹、成人）")
                     .font(.headline)
                 Spacer()
             }
+			
+			Text("不同医院与检测方法的参考区间可能不同，请以检验报告为准。来源见下方「来源与引用」。")
+				.font(.caption)
+				.foregroundStyle(.secondary)
             
-            VStack(spacing: 12) {
-                normalRangeRow(
-                    title: "成年男性",
-                    range: "210～420 μmol/L",
-                    subRange: "(3.5～7.0 mg/dL)"
-                )
-                
-                normalRangeRow(
-                    title: "成年女性（绝经前）",
-                    range: "150～360 μmol/L",
-                    subRange: "(2.5～6.0 mg/dL)"
-                )
-                
-                normalRangeRow(
-                    title: "绝经后女性",
-                    range: "接近男性标准",
-                    subRange: "上限约 420 μmol/L"
-                )
-            }
+			VStack(spacing: 12) {
+				normalRangeRow(
+					title: "成年男性",
+					range: "208～428 μmol/L",
+					subRange: "(3.5～7.2 mg/dL)"
+				)
+				
+				normalRangeRow(
+					title: "成年女性",
+					range: "155～357 μmol/L",
+					subRange: "(2.6～6.0 mg/dL)"
+				)
+			}
         }
     }
     
@@ -508,77 +509,6 @@ struct ReferenceInfoSheet: View {
         )
     }
     
-    private var diagnosisSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "stethoscope")
-                    .foregroundStyle(.orange)
-                Text("高尿酸血症诊断标准")
-                    .font(.headline)
-                Spacer()
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("不分男女")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                
-                Text("非同日 2 次空腹血尿酸 ＞ 420 μmol/L（7.0 mg/dL），即可诊断。")
-                    .font(.system(size: 15))
-                    .foregroundStyle(.primary)
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.orange.opacity(0.08))
-            )
-        }
-    }
-    
-    private var goutControlSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Image(systemName: "target")
-                    .foregroundStyle(.purple)
-                Text("痛风控制目标")
-                    .font(.headline)
-                Spacer()
-            }
-            
-            VStack(spacing: 12) {
-                goutControlRow(
-                    title: "一般痛风患者",
-                    target: "＜ 360 μmol/L",
-                    color: .blue
-                )
-                
-                goutControlRow(
-                    title: "有痛风石或频繁发作",
-                    target: "＜ 300 μmol/L",
-                    color: .purple
-                )
-            }
-        }
-    }
-    
-    private func goutControlRow(title: String, target: String, color: Color) -> some View {
-        HStack {
-            Text(title)
-                .font(.system(size: 15))
-            
-            Spacer()
-            
-            Text(target)
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(color)
-        }
-        .padding()
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemGroupedBackground))
-        )
-    }
-    
     private var noticeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -590,6 +520,9 @@ struct ReferenceInfoSheet: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
+				Text("• 本应用仅用于个人记录与参考，不提供医疗诊断或治疗建议")
+					.font(.caption)
+					.foregroundStyle(.orange)
                 Text("• 以上参考值适用于空腹、成人血尿酸检测")
                     .font(.caption)
                 Text("• 不同医院、不同检测方法可能略有差异")
@@ -598,7 +531,6 @@ struct ReferenceInfoSheet: View {
                     .font(.caption)
                 Text("• 如有异常请咨询医生，不要自行诊断")
                     .font(.caption)
-                    .foregroundStyle(.orange)
             }
             .padding()
             .background(
@@ -607,4 +539,36 @@ struct ReferenceInfoSheet: View {
             )
         }
     }
+	
+	private var sourcesSection: some View {
+		VStack(alignment: .leading, spacing: 12) {
+			HStack {
+				Image(systemName: "book.fill")
+					.foregroundStyle(.indigo)
+				Text("来源与引用")
+					.font(.headline)
+				Spacer()
+			}
+			
+			VStack(alignment: .leading, spacing: 10) {
+				Link("中华内分泌代谢杂志：《中国高尿酸血症与痛风诊疗指南(2019)》", destination: URL(string: "https://seleguide.yiigle.com/uploads/guide_html/%E4%B8%AD%E5%9B%BD%E9%AB%98%E5%B0%BF%E9%85%B8%E8%A1%80%E7%97%87%E4%B8%8E%E7%97%9B%E9%A3%8E%E8%AF%8A%E7%96%97%E6%8C%87%E5%8D%97(2019).html")!)
+					.font(.caption)
+					.foregroundStyle(.blue)
+				Link("国家卫健委：成人高尿酸血症与痛风食养指南（2024年版）", destination: URL(string: "http://www.nhc.gov.cn/sps/c100088/202402/9ba512ba8e314a47a181db11d2fa188d.shtml")!)
+					.font(.caption)
+					.foregroundStyle(.blue)
+				Link("有来医生：尿酸正常值参考表（参考区间示例）", destination: URL(string: "https://m.youlai.cn/sjingbian/article/DD9828MtgUu.html")!)
+					.font(.caption)
+					.foregroundStyle(.blue)
+				Link("PubChem：Uric acid（分子量用于单位换算）", destination: URL(string: "https://pubchem.ncbi.nlm.nih.gov/compound/Uric-acid")!)
+					.font(.caption)
+					.foregroundStyle(.blue)
+			}
+			.padding()
+			.background(
+				RoundedRectangle(cornerRadius: 12)
+					.fill(Color(.secondarySystemGroupedBackground))
+			)
+		}
+	}
 }

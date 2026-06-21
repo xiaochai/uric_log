@@ -10,6 +10,7 @@ struct TrendsView: View {
 	@AppStorage(AppSettingsKey.preferredUnit) private var preferredUnitRawValue = UricUnit.umolL.rawValue
 	@AppStorage(AppSettingsKey.targetEnabled) private var targetEnabled = false
 	@AppStorage(AppSettingsKey.targetValue) private var targetValue: Double = 420
+	@AppStorage(AppSettingsKey.userGender) private var userGenderRawValue = UserGender.male.rawValue
 
 	@State private var timeRange: TimeRange = .days30
 
@@ -69,6 +70,10 @@ struct TrendsView: View {
 					.font(.system(size: 17, weight: .semibold))
 				Spacer()
 				
+				if targetEnabled {
+					targetChip
+				}
+				
 				if !filteredPoints.isEmpty {
 					Text("\(filteredPoints.count) 条记录")
 						.font(.caption)
@@ -94,6 +99,26 @@ struct TrendsView: View {
 				.fill(Color(.secondarySystemGroupedBackground))
 		)
 		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+	}
+
+	private var targetChip: some View {
+		HStack(spacing: 4) {
+			Image(systemName: "target")
+				.font(.caption2)
+			Text("目标 \(formatValue(targetValue))")
+				.font(.caption)
+				.lineLimit(1)
+				.minimumScaleFactor(0.6)
+				.truncationMode(.tail)
+		}
+		.foregroundStyle(.orange)
+		.padding(.horizontal, 8)
+		.padding(.vertical, 4)
+		.background(
+			Capsule()
+				.fill(Color.orange.opacity(0.1))
+		)
+		.frame(maxWidth: 140, alignment: .trailing)
 	}
 	
 	private var emptyChartView: some View {
@@ -177,24 +202,13 @@ struct TrendsView: View {
 							endPoint: .trailing
 						)
 					)
-					.annotation(position: .topTrailing) {
-						HStack(spacing: 4) {
-							Image(systemName: "target")
-								.font(.caption2)
-							Text("目标 \(formatValue(targetValue))")
-								.font(.caption)
-						}
-						.foregroundStyle(.orange)
-						.padding(.horizontal, 8)
-						.padding(.vertical, 4)
-						.background(
-							RoundedRectangle(cornerRadius: 8)
-								.fill(Color.orange.opacity(0.1))
-						)
-					}
 			}
 		}
 		.chartYScale(domain: yDomain)
+		.chartPlotStyle { plotArea in
+			plotArea
+				.clipShape(RoundedRectangle(cornerRadius: 8))
+		}
 		.chartXAxis {
 			AxisMarks(values: .automatic(desiredCount: 4)) { value in
 				AxisGridLine()
@@ -314,12 +328,16 @@ struct TrendsView: View {
 				measuredAt: record.measuredAt,
 				value: convertedValue,
 				unit: preferredUnit
+				,normalUpperUmol: userGender.normalRangeUpper
 			)
 		}
 	}
 
 	private var yDomain: ClosedRange<Double> {
-		let values = filteredPoints.map(\.value)
+		var values = filteredPoints.map(\.value)
+		if targetEnabled {
+			values.append(targetValue)
+		}
 		let minValue = values.min() ?? 0
 		let maxValue = values.max() ?? 1
 		let padding = max(10, (maxValue - minValue) * 0.15)
@@ -341,6 +359,10 @@ struct TrendsView: View {
 			targetRate = 0
 		}
 		return TrendStats(average: average, min: minValue, max: maxValue, latest: latest, targetRate: targetRate)
+	}
+
+	private var userGender: UserGender {
+		UserGender(rawValue: userGenderRawValue) ?? .male
 	}
 
 	private func formatValue(_ value: Double) -> String {
@@ -421,12 +443,18 @@ private struct TrendPoint {
 	let measuredAt: Date
 	let value: Double
 	let unit: UricUnit
+	let normalUpperUmol: Double
 	
 	var valueColor: Color {
 		let umolValue = UricUnit.convert(value: value, from: unit, to: .umolL)
-		if umolValue <= 360 { return .green }
-		else if umolValue <= 420 { return .orange }
-		else { return .red }
+		if umolValue <= normalUpperUmol {
+			return .green
+		}
+		let delta = umolValue - normalUpperUmol
+		let maxDelta = 200.0
+		let ratio = min(max(delta / maxDelta, 0), 1)
+		let hue = 0.14 - (0.14 * ratio)
+		return Color(hue: hue, saturation: 0.95, brightness: 0.95)
 	}
 }
 

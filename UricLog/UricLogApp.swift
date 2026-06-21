@@ -4,6 +4,7 @@ import CoreData
 @main
 struct UricLogApp: App {
 	@StateObject private var persistenceController: PersistenceController
+	@StateObject private var iCloudSettingsSync = ICloudSettingsSync()
 
 	init() {
 		let iCloudEnabled = UserDefaults.standard.bool(forKey: AppSettingsKey.iCloudEnabled)

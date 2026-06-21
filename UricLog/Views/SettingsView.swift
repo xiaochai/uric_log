@@ -4,6 +4,7 @@ import CoreData
 struct SettingsView: View {
 	@Environment(\.managedObjectContext) private var viewContext
 	@EnvironmentObject private var persistence: PersistenceController
+	@FocusState private var focusedField: FocusField?
 	@FetchRequest(
 		sortDescriptors: [NSSortDescriptor(keyPath: \UricAcidRecordEntity.measuredAt, ascending: false)]
 	) private var records: FetchedResults<UricAcidRecordEntity>
@@ -22,6 +23,10 @@ struct SettingsView: View {
 
 	init() {}
 
+	enum FocusField: Hashable {
+		case targetValue
+	}
+
 	var body: some View {
 		ScrollView {
 			VStack(spacing: 20) {
@@ -35,6 +40,10 @@ struct SettingsView: View {
 				aboutCard
 			}
 			.padding()
+		}
+		.contentShape(Rectangle())
+		.onTapGesture {
+			focusedField = nil
 		}
 		.background(Color(.systemGroupedBackground))
 		.navigationTitle("设置")
@@ -163,6 +172,7 @@ struct SettingsView: View {
 						HStack(spacing: 4) {
 							TextField("", value: $targetValue, format: .number)
 								.keyboardType(.decimalPad)
+							.focused($focusedField, equals: .targetValue)
 								.multilineTextAlignment(.trailing)
 								.frame(width: 60)
 							

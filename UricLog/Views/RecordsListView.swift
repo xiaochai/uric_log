@@ -6,6 +6,7 @@ struct RecordsListView: View {
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \UricAcidRecordEntity.measuredAt, ascending: false)]
     ) private var records: FetchedResults<UricAcidRecordEntity>
+	@AppStorage(AppSettingsKey.userGender) private var userGenderRawValue = UserGender.male.rawValue
 
     @State private var timeRange: TimeRange = .days30
     @State private var showingEditor = false
@@ -94,18 +95,21 @@ struct RecordsListView: View {
                 emptyStateView
             } else {
                 LazyVStack(spacing: 12) {
-                    ForEach(filteredRecords, id: \.objectID) { record in
-                        RecordCard(record: record) {
-                            editingRecord = record
-                            showingEditor = true
-                        } onDelete: {
-                            delete(record)
-                        }
-                    }
+					ForEach(filteredRecords.map(UricAcidRecordSnapshot.init(record:)), id: \.id) { snapshot in
+						RecordCard(record: snapshot, userGender: userGender) {
+							edit(objectID: snapshot.id)
+						} onDelete: {
+							delete(objectID: snapshot.id)
+						}
+					}
                 }
             }
         }
     }
+
+	private var userGender: UserGender {
+		UserGender(rawValue: userGenderRawValue) ?? .male
+	}
     
     private var emptyStateView: some View {
         VStack(spacing: 16) {
@@ -135,15 +139,41 @@ struct RecordsListView: View {
         return records.filter { $0.measuredAt >= start }
     }
 
-    private func delete(_ record: UricAcidRecordEntity) {
-        viewContext.delete(record)
-        try? viewContext.save()
-    }
+	private func edit(objectID: NSManagedObjectID) {
+		if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
+			editingRecord = record
+			showingEditor = true
+		}
+	}
+
+	private func delete(objectID: NSManagedObjectID) {
+		if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
+			viewContext.delete(record)
+			try? viewContext.save()
+		}
+	}
 }
 
 // MARK: - Record Card
+struct UricAcidRecordSnapshot: Identifiable {
+	let id: NSManagedObjectID
+	let measuredAt: Date
+	let value: Double
+	let unit: UricUnit
+	let note: String
+
+	init(record: UricAcidRecordEntity) {
+		self.id = record.objectID
+		self.measuredAt = record.measuredAt
+		self.value = record.value
+		self.unit = record.unit
+		self.note = record.note ?? ""
+	}
+}
+
 struct RecordCard: View {
-    let record: UricAcidRecordEntity
+	let record: UricAcidRecordSnapshot
+	let userGender: UserGender
     let onTap: () -> Void
     let onDelete: () -> Void
     
@@ -167,12 +197,12 @@ struct RecordCard: View {
                             .font(.system(size: 28, weight: .bold, design: .rounded))
                             .foregroundStyle(valueColor)
                         
-                        Text(record.unit.displayName)
+					Text(record.unit.displayName)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
                     
-                    if let note = record.note, !note.isEmpty {
+				if !record.note.isEmpty {
                         Text(note)
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -228,6 +258,8 @@ struct RecordCard: View {
         }
         .frame(width: 60)
     }
+
+	private var note: String { record.note }
     
     private var valueString: String {
         String(format: "%.0f", record.value)
@@ -235,14 +267,15 @@ struct RecordCard: View {
     
     private var valueColor: Color {
         let value = record.value
-        let umolValue = UricUnit.convert(value: value, from: record.unit, to: .umolL)
-        
-        if umolValue <= 360 {
-            return .green
-        } else if umolValue <= 420 {
-            return .orange
-        } else {
-            return .red
-        }
+		let umolValue = UricUnit.convert(value: value, from: record.unit, to: .umolL)
+		let upper = userGender.normalRangeUpper
+		if umolValue <= upper {
+			return .green
+		}
+		let delta = umolValue - upper
+		let maxDelta = 200.0
+		let ratio = min(max(delta / maxDelta, 0), 1)
+		let hue = 0.14 - (0.14 * ratio)
+		return Color(hue: hue, saturation: 0.95, brightness: 0.95)
     }
 }

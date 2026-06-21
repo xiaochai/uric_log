@@ -20,6 +20,7 @@
 		A1B2C3D4E5F6010203040600 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040601 /* Assets.xcassets */; };
 		A1B2C3D4E5F6010203040610 /* DateFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040611 /* DateFormatter.swift */; };
 		A1B2C3D4E5F6010203040700 /* PersistenceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040701 /* PersistenceController.swift */; };
+		A1B2C3D4E5F6010203040A02 /* ICloudSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +34,7 @@
 		A1B2C3D4E5F6010203040515 /* TrendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendsView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040517 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040519 /* CSVExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CSVExporter.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSettingsSync.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040520 /* UricLog.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UricLog.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1B2C3D4E5F6010203040601 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040611 /* DateFormatter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateFormatter.swift; sourceTree = "<group>"; };
@@ -116,6 +118,7 @@
 			children = (
 				A1B2C3D4E5F6010203040519 /* CSVExporter.swift */,
 				A1B2C3D4E5F6010203040611 /* DateFormatter.swift */,
+				A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -201,6 +204,7 @@
 				A1B2C3D4E5F6010203040516 /* SettingsView.swift in Sources */,
 				A1B2C3D4E5F6010203040518 /* CSVExporter.swift in Sources */,
 				A1B2C3D4E5F6010203040610 /* DateFormatter.swift in Sources */,
+				A1B2C3D4E5F6010203040A02 /* ICloudSettingsSync.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
