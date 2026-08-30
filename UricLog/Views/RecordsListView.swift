@@ -28,10 +28,11 @@ struct RecordsListView: View {
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("尿酸记录")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    editingRecord = nil
+	        .toolbar {
+	            ToolbarItem(placement: .topBarTrailing) {
+	                Button {
+	                    Analytics.track("record_add_tapped")
+	                    editingRecord = nil
                     showingEditor = true
                 } label: {
                     Image(systemName: "plus.circle.fill")
@@ -59,8 +60,11 @@ struct RecordsListView: View {
                     Text(range.displayName).tag(range)
                 }
             }
-            .pickerStyle(.segmented)
-            .padding(.horizontal, 4)
+	            .pickerStyle(.segmented)
+	            .padding(.horizontal, 4)
+			.onChange(of: timeRange) { _, newValue in
+				Analytics.track("records_range_changed", properties: ["range": newValue.rawValue])
+			}
         }
         .padding()
         .background(
@@ -139,17 +143,19 @@ struct RecordsListView: View {
         return records.filter { $0.measuredAt >= start }
     }
 
-	private func edit(objectID: NSManagedObjectID) {
-		if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
+		private func edit(objectID: NSManagedObjectID) {
+			if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
+				Analytics.track("record_opened")
 			editingRecord = record
 			showingEditor = true
 		}
 	}
 
-	private func delete(objectID: NSManagedObjectID) {
-		if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
+		private func delete(objectID: NSManagedObjectID) {
+			if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
 			viewContext.delete(record)
-			try? viewContext.save()
+				try? viewContext.save()
+				Analytics.track("record_deleted")
 		}
 	}
 }
@@ -229,17 +235,21 @@ struct RecordCard: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
-        .contextMenu {
-            Button(role: .destructive) {
-                showingDeleteConfirm = true
+	        .contextMenu {
+	            Button(role: .destructive) {
+	                Analytics.track("record_delete_requested")
+	                showingDeleteConfirm = true
             } label: {
                 Label("删除", systemImage: "trash")
             }
         }
         .alert("确认删除", isPresented: $showingDeleteConfirm) {
-            Button("取消", role: .cancel) {}
-            Button("删除", role: .destructive) {
-                onDelete()
+	            Button("取消", role: .cancel) {
+	                Analytics.track("record_delete_cancelled")
+	            }
+	            Button("删除", role: .destructive) {
+	                Analytics.track("record_delete_confirmed")
+	                onDelete()
             }
         } message: {
             Text("这条记录将被永久删除，无法恢复。")

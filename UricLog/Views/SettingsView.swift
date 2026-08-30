@@ -47,22 +47,34 @@ struct SettingsView: View {
 		}
 		.background(Color(.systemGroupedBackground))
 		.navigationTitle("设置")
-		.alert("需要重启", isPresented: $showingRestartHint) {
-			Button("知道了") {}
+			.alert("需要重启", isPresented: $showingRestartHint) {
+				Button("知道了") {
+					Analytics.track("icloud_restart_hint_acknowledged")
+				}
 		} message: {
 			Text("iCloud 同步开关切换后，建议杀掉 App 重启一次。")
 		}
 		.onAppear {
 			lastPreferredUnitRawValue = preferredUnitRawValue
 		}
-		.onChange(of: preferredUnitRawValue) { _, newValue in
-			let oldUnit = UricUnit(rawValue: lastPreferredUnitRawValue) ?? .umolL
-			let newUnit = UricUnit(rawValue: newValue) ?? .umolL
-			if oldUnit != newUnit {
-				targetValue = UricUnit.convert(value: targetValue, from: oldUnit, to: newUnit)
-				lastPreferredUnitRawValue = newValue
+			.onChange(of: preferredUnitRawValue) { _, newValue in
+				Analytics.track("preferred_unit_changed", properties: ["unit": newValue])
+				let oldUnit = UricUnit(rawValue: lastPreferredUnitRawValue) ?? .umolL
+				let newUnit = UricUnit(rawValue: newValue) ?? .umolL
+				if oldUnit != newUnit {
+					targetValue = UricUnit.convert(value: targetValue, from: oldUnit, to: newUnit)
+					lastPreferredUnitRawValue = newValue
+				}
 			}
-		}
+			.onChange(of: userGenderRawValue) { _, _ in
+				Analytics.track("gender_setting_changed")
+			}
+			.onChange(of: targetEnabled) { _, _ in
+				Analytics.track("target_setting_toggled")
+			}
+			.onChange(of: exportRange) { _, newValue in
+				Analytics.track("export_range_changed", properties: ["range": newValue.rawValue])
+			}
 	}
 	
 	// MARK: - 偏好设置卡片
@@ -279,6 +291,9 @@ struct SettingsView: View {
 								.font(.caption)
 								.foregroundStyle(.secondary)
 						}
+						.simultaneousGesture(TapGesture().onEnded {
+							Analytics.track("csv_share_tapped")
+						})
 					}
 					.padding(.vertical, 12)
 				}
@@ -330,7 +345,8 @@ struct SettingsView: View {
 								.font(.system(size: 16))
 							Text(iCloudEnabled ? persistence.iCloudStatus : "当前仅本地存储")
 								.font(.caption)
-								.foregroundStyle(iCloudEnabled ? (persistence.isSyncing ? .blue : .green) : .secondary)
+								.foregroundStyle(iCloudStatusColor)
+								.fixedSize(horizontal: false, vertical: true)
 						}
 						
 						Spacer()
@@ -343,6 +359,7 @@ struct SettingsView: View {
 						Toggle("", isOn: $iCloudEnabled)
 							.labelsHidden()
 							.onChange(of: iCloudEnabled) { _, _ in
+								Analytics.track("icloud_sync_toggled")
 								showingRestartHint = true
 							}
 					}
@@ -379,14 +396,23 @@ struct SettingsView: View {
 	}
 
 	private func exportCSV() {
+		Analytics.track("csv_export_tapped", properties: ["range": exportRange.rawValue])
 		exportError = nil
 		let preferredUnit = UricUnit(rawValue: preferredUnitRawValue) ?? .umolL
 		let filtered = filterRecords(records: Array(records), range: exportRange)
 		do {
 			exportURL = try CSVExporter.export(records: filtered, preferredUnit: preferredUnit)
+			Analytics.track("csv_export_succeeded")
 		} catch {
 			exportError = error.localizedDescription
+			Analytics.track("csv_export_failed")
 		}
+	}
+
+	private var iCloudStatusColor: Color {
+		guard iCloudEnabled else { return .secondary }
+		if persistence.iCloudSyncFailed { return .red }
+		return persistence.isSyncing ? .blue : .green
 	}
 
 	private func filterRecords(records: [UricAcidRecordEntity], range: TimeRange) -> [UricAcidRecordEntity] {

@@ -31,8 +31,11 @@ struct TrendsView: View {
 			.padding()
 		}
 		.background(Color(.systemGroupedBackground))
-		.navigationTitle("趋势")
-	}
+			.navigationTitle("趋势")
+			.onChange(of: timeRange) { _, newValue in
+				Analytics.track("trends_range_changed", properties: ["range": newValue.rawValue])
+			}
+		}
 	
 	// MARK: - 时间范围卡片
 	private var timeRangeCard: some View {

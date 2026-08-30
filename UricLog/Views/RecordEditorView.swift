@@ -45,16 +45,21 @@ struct RecordEditorView: View {
         .background(Color(.systemGroupedBackground))
         .navigationTitle(record == nil ? "新增记录" : "编辑记录")
         .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("取消") { dismiss() }
-            }
-        }
-        .alert("数值看起来异常", isPresented: $showingExtremeConfirm) {
-            Button("取消", role: .cancel) {
-                pendingSaveValue = nil
-            }
-            Button("仍要保存", role: .destructive) {
+	        .toolbar {
+	            ToolbarItem(placement: .cancellationAction) {
+	                Button("取消") {
+	                    Analytics.track("record_editor_cancelled", properties: ["mode": editorMode])
+	                    dismiss()
+	                }
+	            }
+	        }
+	        .alert("数值看起来异常", isPresented: $showingExtremeConfirm) {
+	            Button("取消", role: .cancel) {
+	                Analytics.track("extreme_value_save_cancelled", properties: ["mode": editorMode])
+	                pendingSaveValue = nil
+	            }
+	            Button("仍要保存", role: .destructive) {
+	                Analytics.track("extreme_value_save_confirmed", properties: ["mode": editorMode])
                 if let value = pendingSaveValue {
                     save(value: value)
                 }
@@ -102,9 +107,10 @@ struct RecordEditorView: View {
                     )
                 
                 VStack(spacing: 8) {
-                    ForEach(UricUnit.allCases) { unit in
-                        Button {
-                            selectedUnit = unit
+	                    ForEach(UricUnit.allCases) { unit in
+	                        Button {
+	                            Analytics.track("record_unit_selected", properties: ["unit": unit.rawValue])
+	                            selectedUnit = unit
                         } label: {
                             Text(unit.displayName)
                                 .font(.caption)
@@ -142,8 +148,9 @@ struct RecordEditorView: View {
                 
                 Spacer()
                 
-                Button {
-                    showingReferenceInfo = true
+	                Button {
+	                    Analytics.track("reference_info_opened")
+	                    showingReferenceInfo = true
                 } label: {
                     Image(systemName: "questionmark.circle")
                         .foregroundStyle(.secondary)
@@ -351,9 +358,11 @@ struct RecordEditorView: View {
         UserGender(rawValue: userGenderRawValue) ?? .male
     }
 
-    private func saveTapped() {
-        guard let value = parsedValue, value > 0 else { return }
-        if looksExtreme(value: value, unit: selectedUnit) {
+	    private func saveTapped() {
+	        guard let value = parsedValue, value > 0 else { return }
+	        Analytics.track("record_save_tapped", properties: ["mode": editorMode])
+	        if looksExtreme(value: value, unit: selectedUnit) {
+	            Analytics.track("extreme_value_warning_shown", properties: ["mode": editorMode])
             pendingSaveValue = value
             showingExtremeConfirm = true
             return
@@ -391,9 +400,18 @@ struct RecordEditorView: View {
                 note: note.trimmingCharacters(in: .whitespacesAndNewlines)
             )
         }
-        try? viewContext.save()
-        dismiss()
-    }
+	        do {
+	            try viewContext.save()
+	            Analytics.track("record_saved", properties: ["mode": editorMode])
+	            dismiss()
+	        } catch {
+	            Analytics.track("record_save_failed", properties: ["mode": editorMode])
+	        }
+	    }
+
+	private var editorMode: String {
+		record == nil ? "create" : "edit"
+	}
 }
 
 // MARK: - 参考信息详情页
@@ -422,7 +440,10 @@ struct ReferenceInfoSheet: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("完成") { dismiss() }
+	                    Button("完成") {
+	                        Analytics.track("reference_info_closed")
+	                        dismiss()
+	                    }
                 }
             }
         }
