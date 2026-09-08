@@ -6,7 +6,7 @@ import os
 final class PersistenceController: ObservableObject {
 	@Published private(set) var isLoaded: Bool = false
 	@Published var loadErrorMessage: String?
-	@Published var iCloudStatus: String = "检查中..."
+	@Published var iCloudStatus: String = L10n.string("检查中...")
 	@Published var isSyncing: Bool = false
 	@Published private(set) var iCloudSyncFailed: Bool = false
 	let container: NSPersistentContainer
@@ -22,7 +22,7 @@ final class PersistenceController: ObservableObject {
 			checkiCloudStatus()
 			setupCloudKitMonitoring()
 		} else {
-			self.iCloudStatus = "已禁用"
+			self.iCloudStatus = L10n.string("已禁用")
 		}
 		
 		DispatchQueue.global(qos: .userInitiated).async {
@@ -31,8 +31,8 @@ final class PersistenceController: ObservableObject {
 					if iCloudEnabled {
 						UserDefaults.standard.set(false, forKey: AppSettingsKey.iCloudEnabled)
 						DispatchQueue.main.async {
-							self.loadErrorMessage = "iCloud 存储初始化失败，已回退到本地存储。\n\n\(error.localizedDescription)"
-							self.iCloudStatus = "连接失败"
+							self.loadErrorMessage = L10n.format("iCloud 存储初始化失败，已回退到本地存储。\n\n%@", error.localizedDescription)
+							self.iCloudStatus = L10n.string("连接失败")
 						}
 						let local = Persistence.buildContainer(iCloudEnabled: false)
 						local.loadPersistentStores { _, localError in
@@ -54,7 +54,7 @@ final class PersistenceController: ObservableObject {
 				DispatchQueue.main.async {
 					self.isLoaded = true
 					if iCloudEnabled {
-						self.iCloudStatus = "已连接"
+						self.iCloudStatus = L10n.string("已连接")
 					}
 				}
 			}
@@ -66,21 +66,21 @@ final class PersistenceController: ObservableObject {
 			DispatchQueue.main.async {
 				switch status {
 				case .available:
-					self.iCloudStatus = "账户可用"
+					self.iCloudStatus = L10n.string("账户可用")
 				case .noAccount:
-					self.iCloudStatus = "未登录 iCloud"
+					self.iCloudStatus = L10n.string("未登录 iCloud")
 				case .restricted:
-					self.iCloudStatus = "受限"
+					self.iCloudStatus = L10n.string("受限")
 				case .couldNotDetermine:
-					self.iCloudStatus = "无法确定"
+					self.iCloudStatus = L10n.string("无法确定")
                 case .temporarilyUnavailable:
-                    self.iCloudStatus = "暂不可用"
+                    self.iCloudStatus = L10n.string("暂不可用")
                 @unknown default:
-					self.iCloudStatus = "未知状态"
+					self.iCloudStatus = L10n.string("未知状态")
 				}
 				
 				if let error {
-					self.iCloudStatus = "错误: \(error.localizedDescription)"
+					self.iCloudStatus = L10n.format("错误: %@", error.localizedDescription)
 				}
 			}
 		}
@@ -101,13 +101,13 @@ final class PersistenceController: ObservableObject {
 		DispatchQueue.main.async {
 			switch event.type {
 			case .setup:
-				self.iCloudStatus = "初始化中..."
+				self.iCloudStatus = L10n.string("初始化中...")
 			case .import:
 				self.isSyncing = true
-				self.iCloudStatus = "导入中..."
+				self.iCloudStatus = L10n.string("导入中...")
 			case .export:
 				self.isSyncing = true
-				self.iCloudStatus = "同步到 iCloud..."
+				self.iCloudStatus = L10n.string("同步到 iCloud...")
 			default:
 				break
 			}
@@ -121,13 +121,13 @@ final class PersistenceController: ObservableObject {
 						self.iCloudSyncFailed = false
 					}
 					if self.lastFailedEventType == nil {
-						self.iCloudStatus = "同步完成"
+						self.iCloudStatus = L10n.string("同步完成")
 					}
 				} else {
 					let message = self.userFacingMessage(for: event.error)
 					self.lastFailedEventType = event.type
 					self.iCloudSyncFailed = true
-					self.iCloudStatus = "同步失败：\(message)"
+					self.iCloudStatus = L10n.format("同步失败：%@", message)
 					self.logger.error(
 						"CloudKit \(String(describing: event.type), privacy: .public) failed: \(String(describing: event.error), privacy: .public)"
 					)
@@ -137,40 +137,52 @@ final class PersistenceController: ObservableObject {
 	}
 
 	private func userFacingMessage(for error: Error?) -> String {
-		guard let error else { return "暂时无法连接 iCloud，请稍后重试" }
+		guard let error else { return L10n.string("暂时无法连接 iCloud，请稍后重试") }
 
 		let nsError = error as NSError
 		guard nsError.domain == CKErrorDomain,
 			let code = CKError.Code(rawValue: nsError.code) else {
-			return "暂时无法连接 iCloud，请稍后重试"
+			return L10n.string("暂时无法连接 iCloud，请稍后重试")
 		}
 
 		switch code {
 		case .notAuthenticated:
-			return "未登录 iCloud，请前往系统设置登录"
+			return L10n.string("未登录 iCloud，请前往系统设置登录")
 		case .networkUnavailable, .networkFailure:
-			return "网络不可用，请检查网络后重试"
+			return L10n.string("网络不可用，请检查网络后重试")
 		case .serviceUnavailable:
-			return "iCloud 服务暂不可用，请稍后重试"
+			return L10n.string("iCloud 服务暂不可用，请稍后重试")
 		case .requestRateLimited:
 			if let retryAfter = nsError.userInfo[CKErrorRetryAfterKey] as? TimeInterval {
-				return "同步请求较频繁，请在 \(max(1, Int(retryAfter.rounded()))) 秒后重试"
+				return L10n.format("同步请求较频繁，请在 %d 秒后重试", max(1, Int(retryAfter.rounded())))
 			}
-			return "同步请求较频繁，请稍后重试"
+			return L10n.string("同步请求较频繁，请稍后重试")
 		case .quotaExceeded:
-			return "iCloud 存储空间不足"
+			return L10n.string("iCloud 存储空间不足")
 		case .permissionFailure:
-			return "没有访问 iCloud 数据的权限"
+			return L10n.string("没有访问 iCloud 数据的权限")
 		case .accountTemporarilyUnavailable:
-			return "iCloud 账户暂不可用，请稍后重试"
+			return L10n.string("iCloud 账户暂不可用，请稍后重试")
 		case .zoneNotFound, .unknownItem:
-			return "iCloud 数据尚未准备好，请稍后重试"
+			return L10n.string("iCloud 数据尚未准备好，请稍后重试")
 		case .serverRejectedRequest, .invalidArguments:
-			return "云端数据配置异常，请联系开发者"
+			return L10n.string("云端数据配置异常，请联系开发者")
 		case .partialFailure:
-			return "部分数据未能同步，请稍后重试"
+			return L10n.string("部分数据未能同步，请稍后重试")
 		default:
-			return "暂时无法连接 iCloud，请稍后重试"
+			return L10n.string("暂时无法连接 iCloud，请稍后重试")
+		}
+	}
+
+	func refreshLocalizedStatus() {
+		if !iCloudEnabled {
+			iCloudStatus = L10n.string("已禁用")
+		} else if iCloudSyncFailed {
+			iCloudStatus = L10n.format("同步失败：%@", L10n.string("暂时无法连接 iCloud，请稍后重试"))
+		} else if isSyncing {
+			iCloudStatus = L10n.string("同步到 iCloud...")
+		} else {
+			iCloudStatus = L10n.string("已连接")
 		}
 	}
 	

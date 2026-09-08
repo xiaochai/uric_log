@@ -7,7 +7,7 @@ enum CSVExporter {
 		var errorDescription: String? {
 			switch self {
 			case .failedToWrite:
-				return "导出失败"
+				return L10n.string("导出失败")
 			}
 		}
 	}

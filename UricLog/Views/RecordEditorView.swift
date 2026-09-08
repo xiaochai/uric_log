@@ -43,7 +43,7 @@ struct RecordEditorView: View {
             .padding()
         }
         .background(Color(.systemGroupedBackground))
-        .navigationTitle(record == nil ? "新增记录" : "编辑记录")
+        .navigationTitle(L10n.string(record == nil ? "新增记录" : "编辑记录"))
         .navigationBarTitleDisplayMode(.large)
 	        .toolbar {
 	            ToolbarItem(placement: .cancellationAction) {
@@ -161,7 +161,7 @@ struct RecordEditorView: View {
             // 当前性别对应的正常范围
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("您的正常范围（\(userGender.displayName)）")
+                    Text(L10n.format("您的正常范围（%@）", userGender.displayName))
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                     
@@ -212,12 +212,12 @@ struct RecordEditorView: View {
                 .foregroundStyle(color)
                 .font(.title3)
             
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(.system(size: 15, weight: .medium))
             
             Spacer()
             
-            Text(description)
+            Text(LocalizedStringKey(description))
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -280,7 +280,6 @@ struct RecordEditorView: View {
                 .datePickerStyle(.wheel)
                 .labelsHidden()
                 .frame(height: 180)
-                .environment(\.locale, Locale(identifier: "zh_CN"))
         }
         .padding()
         .background(
@@ -510,9 +509,9 @@ struct ReferenceInfoSheet: View {
     private func normalRangeRow(title: String, range: String, subRange: String) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                Text(title)
+                Text(LocalizedStringKey(title))
                     .font(.system(size: 15, weight: .medium))
-                Text(subRange)
+                Text(LocalizedStringKey(subRange))
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

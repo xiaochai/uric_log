@@ -78,7 +78,7 @@ struct TrendsView: View {
 				}
 				
 				if !filteredPoints.isEmpty {
-					Text("\(filteredPoints.count) 条记录")
+					Text(L10n.format("%d 条记录", filteredPoints.count))
 						.font(.caption)
 						.foregroundStyle(.secondary)
 						.padding(.horizontal, 8)
@@ -108,7 +108,7 @@ struct TrendsView: View {
 		HStack(spacing: 4) {
 			Image(systemName: "target")
 				.font(.caption2)
-			Text("目标 \(formatValue(targetValue))")
+			Text(L10n.format("目标 %@", formatValue(targetValue)))
 				.font(.caption)
 				.lineLimit(1)
 				.minimumScaleFactor(0.6)
@@ -148,8 +148,8 @@ struct TrendsView: View {
 			// 渐变区域
 			ForEach(filteredPoints, id: \.recordID) { point in
 				AreaMark(
-					x: .value("时间", point.measuredAt),
-					y: .value("尿酸", point.value)
+						x: .value(L10n.string("时间"), point.measuredAt),
+						y: .value(L10n.string("尿酸"), point.value)
 				)
 				.interpolationMethod(.catmullRom)
 				.foregroundStyle(
@@ -164,8 +164,8 @@ struct TrendsView: View {
 			// 线条
 			ForEach(filteredPoints, id: \.recordID) { point in
 				LineMark(
-					x: .value("时间", point.measuredAt),
-					y: .value("尿酸", point.value)
+					x: .value(L10n.string("时间"), point.measuredAt),
+					y: .value(L10n.string("尿酸"), point.value)
 				)
 				.interpolationMethod(.catmullRom)
 				.foregroundStyle(
@@ -181,8 +181,8 @@ struct TrendsView: View {
 			// 数据点
 			ForEach(filteredPoints, id: \.recordID) { point in
 				PointMark(
-					x: .value("时间", point.measuredAt),
-					y: .value("尿酸", point.value)
+					x: .value(L10n.string("时间"), point.measuredAt),
+					y: .value(L10n.string("尿酸"), point.value)
 				)
 				.symbol {
 					Circle()
@@ -196,7 +196,7 @@ struct TrendsView: View {
 			}
 
 			if targetEnabled {
-				RuleMark(y: .value("目标", targetValue))
+				RuleMark(y: .value(L10n.string("目标"), targetValue))
 					.lineStyle(StrokeStyle(lineWidth: 2, dash: [6, 4]))
 					.foregroundStyle(
 						LinearGradient(
@@ -391,7 +391,7 @@ private struct StatItemView: View {
 				Image(systemName: icon)
 					.font(.caption)
 					.foregroundStyle(color)
-				Text(title)
+				Text(LocalizedStringKey(title))
 					.font(.caption)
 					.foregroundStyle(.secondary)
 			}
@@ -423,7 +423,7 @@ private struct TargetStatView: View {
 				.foregroundStyle(color)
 			
 			VStack(alignment: .leading, spacing: 2) {
-				Text(title)
+				Text(LocalizedStringKey(title))
 					.font(.caption)
 					.foregroundStyle(.secondary)
 				Text(value)

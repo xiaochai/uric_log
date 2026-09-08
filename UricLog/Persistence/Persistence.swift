@@ -2,6 +2,13 @@ import Foundation
 import CoreData
 
 enum Persistence {
+	static var hasExistingStore: Bool {
+		let path = storeURL.path
+		return FileManager.default.fileExists(atPath: path)
+			|| FileManager.default.fileExists(atPath: path + "-wal")
+			|| FileManager.default.fileExists(atPath: path + "-shm")
+	}
+
 	static func buildContainer(iCloudEnabled: Bool) -> NSPersistentContainer {
 		let model = makeManagedObjectModel()
 		let container: NSPersistentContainer
@@ -23,11 +30,18 @@ enum Persistence {
 		return container
 	}
 
-	private static func makeStoreURL() -> URL {
+	private static var storeURL: URL {
 		let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-		let dir = base.appendingPathComponent("UricLog", isDirectory: true)
+		return base
+			.appendingPathComponent("UricLog", isDirectory: true)
+			.appendingPathComponent("UricLog.sqlite")
+	}
+
+	private static func makeStoreURL() -> URL {
+		let url = storeURL
+		let dir = url.deletingLastPathComponent()
 		try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-		return dir.appendingPathComponent("UricLog.sqlite")
+		return url
 	}
 
 	private static func makeManagedObjectModel() -> NSManagedObjectModel {

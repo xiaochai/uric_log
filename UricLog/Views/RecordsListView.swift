@@ -83,7 +83,7 @@ struct RecordsListView: View {
                 
                 Spacer()
                 
-                Text("\(filteredRecords.count) 条")
+                Text(L10n.format("%d 条", filteredRecords.count))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 8)

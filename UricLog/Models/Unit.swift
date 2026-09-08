@@ -29,11 +29,20 @@ enum UricUnit: String, CaseIterable, Identifiable, Codable {
 }
 
 enum AppSettingsKey {
+	static let appLanguage = "appLanguage"
 	static let preferredUnit = "preferredUnit"
 	static let userGender = "userGender"
 	static let targetEnabled = "targetEnabled"
 	static let targetValue = "targetValue"
 	static let iCloudEnabled = "iCloudEnabled"
+
+	static let legacyKeys = [
+		preferredUnit,
+		userGender,
+		targetEnabled,
+		targetValue,
+		iCloudEnabled,
+	]
 }
 
 enum UserGender: String, CaseIterable, Identifiable, Codable {
@@ -45,9 +54,9 @@ enum UserGender: String, CaseIterable, Identifiable, Codable {
 	var displayName: String {
 		switch self {
 		case .male:
-			return "男性"
+			return L10n.string("男性")
 		case .female:
-			return "女性"
+			return L10n.string("女性")
 		}
 	}
 	
@@ -91,13 +100,13 @@ enum TimeRange: String, CaseIterable, Identifiable {
 	var displayName: String {
 		switch self {
 		case .days7:
-			return "7天"
+			return L10n.string("7天")
 		case .days30:
-			return "30天"
+			return L10n.string("30天")
 		case .days90:
-			return "90天"
+			return L10n.string("90天")
 		case .all:
-			return "全部"
+			return L10n.string("全部")
 		}
 	}
 

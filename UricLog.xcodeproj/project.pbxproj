@@ -23,6 +23,9 @@
 		A1B2C3D4E5F6010203040A02 /* ICloudSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */; };
 		A1B2C3D4E5F6010203040B01 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6010203040B03 /* PostHog */; };
 		A1B2C3D4E5F6010203040C02 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040C01 /* Analytics.swift */; };
+		A1B2C3D4E5F6010203040D02 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040D01 /* Localization.swift */; };
+		A1B2C3D4E5F6010203040F02 /* DailySplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */; };
+		A1B2C3D4E5F6010203040E02 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040E01 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,6 +46,10 @@
 		A1B2C3D4E5F6010203040801 /* UricLog.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = UricLog.entitlements; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSettingsSync.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040C01 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203040D01 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySplashView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203040E03 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203040E04 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +77,7 @@
 			children = (
 				A1B2C3D4E5F6010203040507 /* UricLogApp.swift */,
 				A1B2C3D4E5F6010203040601 /* Assets.xcassets */,
+				A1B2C3D4E5F6010203040E01 /* Localizable.strings */,
 				A1B2C3D4E5F6010203040801 /* UricLog.entitlements */,
 				A1B2C3D4E5F6010203040543 /* Models */,
 				A1B2C3D4E5F6010203040544 /* Persistence */,
@@ -108,6 +116,7 @@
 		A1B2C3D4E5F6010203040545 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */,
 				A1B2C3D4E5F601020304050F /* RootTabView.swift */,
 				A1B2C3D4E5F6010203040511 /* RecordsListView.swift */,
 				A1B2C3D4E5F6010203040513 /* RecordEditorView.swift */,
@@ -124,6 +133,7 @@
 				A1B2C3D4E5F6010203040611 /* DateFormatter.swift */,
 				A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */,
 				A1B2C3D4E5F6010203040C01 /* Analytics.swift */,
+				A1B2C3D4E5F6010203040D01 /* Localization.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -171,6 +181,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 				Base,
 			);
 			mainGroup = A1B2C3D4E5F6010203040540;
@@ -193,6 +204,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D4E5F6010203040600 /* Assets.xcassets in Resources */,
+				A1B2C3D4E5F6010203040E02 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,10 +229,24 @@
 				A1B2C3D4E5F6010203040610 /* DateFormatter.swift in Sources */,
 				A1B2C3D4E5F6010203040A02 /* ICloudSettingsSync.swift in Sources */,
 				A1B2C3D4E5F6010203040C02 /* Analytics.swift in Sources */,
+				A1B2C3D4E5F6010203040D02 /* Localization.swift in Sources */,
+				A1B2C3D4E5F6010203040F02 /* DailySplashView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A1B2C3D4E5F6010203040E01 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1B2C3D4E5F6010203040E03 /* en */,
+				A1B2C3D4E5F6010203040E04 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		A1B2C3D4E5F6010203040570 /* Debug */ = {

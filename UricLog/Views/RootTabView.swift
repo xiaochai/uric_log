@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RootTabView: View {
-	@State private var selectedTab = "records"
+	@SceneStorage("selectedTab") private var selectedTab = "records"
 
 	var body: some View {
 		TabView(selection: $selectedTab) {

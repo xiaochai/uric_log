@@ -1,49 +1,49 @@
 import Foundation
 
 enum DateFormatters {
-    static let chineseDateTime: DateFormatter = {
+    static func dateTime(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年MM月dd日 HH:mm"
+        formatter.locale = locale
+        formatter.setLocalizedDateFormatFromTemplate("yMMMdjmm")
         return formatter
-    }()
+    }
     
-    static let chineseDate: DateFormatter = {
+    static func date(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "yyyy年MM月dd日"
+        formatter.locale = locale
+        formatter.setLocalizedDateFormatFromTemplate("yMMMd")
         return formatter
-    }()
+    }
     
-    static let chineseShortDate: DateFormatter = {
+    static func shortDate(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "M月d日"
+        formatter.locale = locale
+        formatter.setLocalizedDateFormatFromTemplate("MMMd")
         return formatter
-    }()
+    }
     
-    static let chineseTime: DateFormatter = {
+    static func time(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = "HH:mm"
+        formatter.locale = locale
+        formatter.timeStyle = .short
         return formatter
-    }()
+    }
 }
 
 extension Date {
     var chineseDateTime: String {
-        DateFormatters.chineseDateTime.string(from: self)
+        DateFormatters.dateTime(locale: AppLanguage.selected.locale).string(from: self)
     }
     
     var chineseDate: String {
-        DateFormatters.chineseDate.string(from: self)
+        DateFormatters.date(locale: AppLanguage.selected.locale).string(from: self)
     }
     
     var chineseShortDate: String {
-        DateFormatters.chineseShortDate.string(from: self)
+        DateFormatters.shortDate(locale: AppLanguage.selected.locale).string(from: self)
     }
     
     var chineseTime: String {
-        DateFormatters.chineseTime.string(from: self)
+        DateFormatters.time(locale: AppLanguage.selected.locale).string(from: self)
     }
 }

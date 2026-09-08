@@ -14,6 +14,7 @@ struct SettingsView: View {
 	@AppStorage(AppSettingsKey.targetEnabled) private var targetEnabled = false
 	@AppStorage(AppSettingsKey.targetValue) private var targetValue: Double = 420
 	@AppStorage(AppSettingsKey.iCloudEnabled) private var iCloudEnabled = false
+	@AppStorage(AppSettingsKey.appLanguage) private var appLanguageRawValue = AppLanguage.simplifiedChinese.rawValue
 
 	@State private var exportRange: TimeRange = .days90
 	@State private var exportURL: URL?
@@ -90,6 +91,36 @@ struct SettingsView: View {
 			}
 			
 			VStack(spacing: 0) {
+				HStack(spacing: 12) {
+					SettingIconView(icon: "globe", color: .teal)
+
+					VStack(alignment: .leading, spacing: 4) {
+						Text("应用语言")
+							.font(.system(size: 16))
+						Text("选择应用界面使用的语言")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+
+					Spacer()
+
+					Picker("语言", selection: $appLanguageRawValue) {
+						ForEach(AppLanguage.allCases) { language in
+							Text(language.displayName).tag(language.rawValue)
+						}
+					}
+					.pickerStyle(.menu)
+					.labelsHidden()
+				}
+				.padding(.vertical, 12)
+				.onChange(of: appLanguageRawValue) { _, newValue in
+					Analytics.track("app_language_changed", properties: ["language": newValue])
+					persistence.refreshLocalizedStatus()
+				}
+
+				Divider()
+					.padding(.leading, 44)
+
 				// 单位选择
 				HStack(spacing: 12) {
 					SettingIconView(icon: "ruler.fill", color: .blue)
@@ -343,7 +374,7 @@ struct SettingsView: View {
 						VStack(alignment: .leading, spacing: 4) {
 							Text("iCloud 同步")
 								.font(.system(size: 16))
-							Text(iCloudEnabled ? persistence.iCloudStatus : "当前仅本地存储")
+							Text(iCloudEnabled ? persistence.iCloudStatus : L10n.string("当前仅本地存储"))
 								.font(.caption)
 								.foregroundStyle(iCloudStatusColor)
 								.fixedSize(horizontal: false, vertical: true)
