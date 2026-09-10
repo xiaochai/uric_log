@@ -1,6 +1,5 @@
 import GoogleMobileAds
 import OSLog
-import StoreKit
 import UIKit
 import UMCommon
 import UMUnionSDK
@@ -38,8 +37,8 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 	}
 
 	func startIfAllowed() {
-		guard UserDefaults.standard.bool(forKey: AppSettingsKey.privacyConsentGranted) else { return }
 		let resolvedProvider = resolveProvider()
+		guard isAdvertisingAllowed(for: resolvedProvider) else { return }
 		guard provider == nil || provider == resolvedProvider else {
 			Self.logger.info("Ad provider change will apply after the next app launch")
 			return
@@ -96,7 +95,8 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 	var isWaitingForLoad: Bool { isLoading }
 
 	func attemptForegroundPresentation() {
-		guard UserDefaults.standard.bool(forKey: AppSettingsKey.privacyConsentGranted),
+		guard let provider,
+			isAdvertisingAllowed(for: provider),
 			!hasDisplayedToday,
 			!isPresenting else { return }
 
@@ -131,9 +131,18 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 		case .admob: return .admob
 		case .umeng: return .umeng
 		case .automatic:
-			let countryCode = SKPaymentQueue.default().storefront?.countryCode
+			let countryCode = AppStoreRegion.countryCode
 			Self.logger.info("App Store storefront: \(countryCode ?? "unknown", privacy: .public)")
 			return countryCode == "CHN" ? .umeng : .admob
+		}
+	}
+
+	private func isAdvertisingAllowed(for provider: AdProvider) -> Bool {
+		switch provider {
+		case .admob:
+			return true
+		case .umeng:
+			return UserDefaults.standard.bool(forKey: AppSettingsKey.privacyConsentGranted)
 		}
 	}
 

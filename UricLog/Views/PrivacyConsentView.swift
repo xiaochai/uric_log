@@ -11,7 +11,7 @@ struct PrivacyConsentContainer<Content: View>: View {
 
 	var body: some View {
 		Group {
-			if hasMadeChoice {
+			if !AppStoreRegion.isMainlandChina || hasMadeChoice {
 				content
 			} else {
 				PrivacyConsentView(

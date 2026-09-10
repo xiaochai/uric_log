@@ -5,189 +5,184 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>隐私政策 - 尿酸记录</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            line-height: 1.8;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            padding: 50px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        h1 {
-            font-size: 32px;
-            color: #2d3748;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .subtitle {
-            text-align: center;
-            color: #718096;
-            margin-bottom: 40px;
-            font-size: 14px;
-        }
-        h2 {
-            font-size: 20px;
-            color: #4a5568;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-        p {
-            margin-bottom: 15px;
-            color: #4a5568;
-        }
-        ul {
-            margin-left: 25px;
-            margin-bottom: 15px;
-        }
-        li {
-            margin-bottom: 8px;
-            color: #4a5568;
-        }
-        .highlight {
-            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 25px 0;
-        }
-        .highlight p {
-            margin: 0;
-            font-weight: 500;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid #e2e8f0;
-            color: #718096;
-            font-size: 14px;
-        }
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 24px;
-            }
-        }
+        :root { color-scheme: light dark; --bg: #f4f6f8; --surface: #fff; --text: #202124; --muted: #667085; --line: #e4e7ec; --accent: #1769aa; }
+        @media (prefers-color-scheme: dark) { :root { --bg: #111315; --surface: #1c1f22; --text: #f2f4f7; --muted: #aeb4bd; --line: #34383d; --accent: #64b5f6; } }
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 32px 18px; background: var(--bg); color: var(--text); font: 16px/1.72 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        main { max-width: 760px; margin: auto; padding: 36px 40px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+        header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 28px; }
+        h1 { margin: 0 0 6px; font-size: 30px; letter-spacing: 0; }
+        h2 { margin: 30px 0 10px; font-size: 20px; letter-spacing: 0; }
+        p { margin: 10px 0; }
+        ul { margin: 10px 0; padding-left: 24px; }
+        li { margin: 6px 0; }
+        a { color: var(--accent); }
+        .summary { padding: 16px 18px; background: var(--bg); border-left: 3px solid var(--accent); }
+        .subtitle, footer { color: var(--muted); }
+        .language { display: flex; gap: 8px; margin-top: 18px; }
+        .language button { padding: 7px 12px; border: 1px solid var(--line); border-radius: 6px; color: var(--text); background: var(--surface); font: inherit; cursor: pointer; }
+        .language button[aria-pressed="true"] { color: white; background: var(--accent); border-color: var(--accent); }
+        footer { border-top: 1px solid var(--line); margin-top: 36px; padding-top: 20px; font-size: 14px; }
+        [data-language] { display: none; }
+        @media (max-width: 600px) { body { padding: 0; } main { border: 0; border-radius: 0; padding: 28px 20px; } h1 { font-size: 26px; } }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>隐私政策</h1>
-        <p class="subtitle">尿酸记录 App</p>
-
-        <div class="highlight">
-            <p>我们非常重视您的隐私。本应用采用"本地优先"的设计理念。尿酸记录等健康数据主要存储在设备本地，仅在您主动开启 iCloud 同步时通过 Apple CloudKit 在您的设备间同步。经您同意后，我们使用 PostHog 收集有限的匿名使用事件，并使用友盟 U-AppWin 展示广告。</p>
+    <main>
+        <div class="language" aria-label="Language">
+            <button type="button" data-language-button="zh-CN">中文</button>
+            <button type="button" data-language-button="en">English</button>
         </div>
 
-        <h2>1. 数据收集</h2>
-        <p>本应用不会通过 PostHog 收集或上传以下数据：</p>
-        <ul>
-            <li>尿酸检测数值、目标数值、测量日期和记录标识</li>
-            <li>记录备注或您输入的其他自由文本</li>
-            <li>姓名、邮箱、电话号码等直接身份信息</li>
-            <li>性别设置的具体选择</li>
-            <li>位置信息</li>
-        </ul>
-        <p>为了了解功能使用情况和改善应用，我们会收集有限的分析数据：</p>
-        <ul>
-            <li>应用安装、升级、启动及前后台切换事件</li>
-            <li>页面切换、按钮点击、功能开关和筛选范围等产品交互事件</li>
-            <li>应用版本、操作系统版本、设备类型、语言或时区等基础技术信息</li>
-            <li>PostHog 生成的随机匿名标识符，以及服务请求过程中可能处理的 IP 地址</li>
-        </ul>
+        <article data-language="zh-CN">
+            <header>
+                <h1>隐私政策</h1>
+                <p class="subtitle">尿酸记录 App</p>
+            </header>
+            <p class="summary">尿酸记录采用本地优先设计。您的尿酸数值、备注等健康内容保存在设备本地；仅当您主动开启 iCloud 同步时，相关数据才会通过 Apple CloudKit 在您自己的设备间同步。</p>
 
-        <h2>2. 数据存储</h2>
-        <p>所有数据采用以下方式存储：</p>
-        <ul>
-            <li><strong>本地存储</strong>：所有记录首先保存在您的设备本地数据库中</li>
-            <li><strong>iCloud 同步（可选）</strong>：当您开启 iCloud 同步功能时，数据会通过 Apple 的 CloudKit 服务在您的设备间同步。此功能完全可选，可随时关闭</li>
-            <li><strong>产品分析</strong>：有限的匿名使用事件会发送至 PostHog，用于统计功能使用情况和改进体验</li>
-        </ul>
+            <h2>1. 我们处理的信息</h2>
+            <p>我们不会向产品分析或广告服务上传尿酸检测数值、目标数值、测量日期、记录备注、性别设置或其他健康内容。</p>
+            <p>为了了解功能使用情况并改进应用，我们通过 PostHog 处理有限的产品分析信息，包括：</p>
+            <ul>
+                <li>应用启动、页面切换、按钮点击、功能开关及筛选范围等交互事件；</li>
+                <li>应用版本、操作系统版本、设备类型、应用语言和时区等基础技术信息；</li>
+                <li>PostHog 生成的随机标识符，以及网络请求过程中可能处理的 IP 地址。</li>
+            </ul>
+            <p>我们不要求您为产品分析提供姓名、邮箱或电话号码，也不会主动将分析标识符与您的健康记录关联。</p>
 
-        <h2>3. iCloud 同步</h2>
-        <p>当您启用 iCloud 同步功能时：</p>
-        <ul>
-            <li>数据通过 Apple CloudKit 服务存储在您的私人 iCloud 账户中</li>
-            <li>我们<strong>无法访问</strong>您的 iCloud 数据</li>
-            <li>同步仅在您登录的 Apple 设备间进行</li>
-            <li>您可以随时在设置中关闭 iCloud 同步功能</li>
-        </ul>
+            <h2>2. 本地存储与 iCloud</h2>
+            <ul>
+                <li><strong>本地存储：</strong>健康记录首先保存在设备本地数据库中。</li>
+                <li><strong>iCloud 同步：</strong>开启后，记录会通过 Apple CloudKit 存储在您的私人 iCloud 账户并在您的 Apple 设备间同步。我们无法直接查看您的私人 CloudKit 数据。</li>
+                <li><strong>关闭同步：</strong>您可随时在应用设置中关闭 iCloud 同步。</li>
+            </ul>
 
-        <h2>4. 数据导出</h2>
-        <p>应用提供 CSV 导出功能，导出的文件：</p>
-        <ul>
-            <li>仅保存在您选择的本地位置</li>
-            <li>不会上传至任何服务器</li>
-            <li>由您完全控制其使用和分享</li>
-        </ul>
+            <h2>3. CSV 导出</h2>
+            <p>您可以将记录导出为 CSV 文件。文件仅保存或分享至您主动选择的位置，应用不会代您将导出文件上传至我们的服务器。</p>
 
-        <h2>5. PostHog 产品分析</h2>
-        <p>本应用使用 PostHog 提供产品分析服务：</p>
-        <ul>
-            <li>数据用途仅限于安装验证、使用趋势分析、功能改进和问题排查</li>
-            <li>数据发送至 PostHog 美国区域服务，可能在您所在国家或地区以外处理</li>
-            <li>我们已关闭 Session Replay、控件自动采集、自动页面采集、问卷、推送订阅采集和崩溃自动采集</li>
-            <li>我们不会向 PostHog 发送尿酸记录、备注或其他健康内容</li>
-            <li>PostHog 的隐私说明可查看 <a href="https://posthog.com/privacy" rel="noopener noreferrer">PostHog Privacy Policy</a></li>
-        </ul>
+            <h2>4. 产品分析</h2>
+            <p>我们使用 PostHog 统计匿名化的产品使用趋势、验证安装和协助排查问题。分析服务不受广告授权选择影响。</p>
+            <ul>
+                <li>分析数据可能由 PostHog 的美国区域服务处理；</li>
+                <li>我们关闭了 Session Replay、控件自动采集、自动页面采集、问卷、推送订阅采集和崩溃自动采集；</li>
+                <li><a href="https://posthog.com/privacy" rel="noopener noreferrer">PostHog 隐私政策</a>。</li>
+            </ul>
 
-        <h2>6. 友盟 U-AppWin 广告</h2>
-        <p>经您同意后，本应用会启用友盟 U-AppWin 广告服务：</p>
-        <ul>
-            <li>友盟 U-AppWin 用于请求和展示广告，可能处理设备标识符、广告互动、设备信息、网络信息和 IP 地址</li>
-            <li>我们不会通过友盟 U-AppWin 上传尿酸记录、备注或其他健康内容，也不会将其用于本应用的产品功能统计</li>
-            <li>友盟+隐私政策：<a href="https://www.umeng.com/page/policy" rel="noopener noreferrer">https://www.umeng.com/page/policy</a></li>
-        </ul>
+            <h2>5. 广告与授权</h2>
+            <p>应用根据下载账号对应的 App Store 地区选择广告服务，并在完成适用的隐私告知或选择流程后请求广告：</p>
+            <ul>
+                <li><strong>中国大陆 App Store：</strong>使用友盟 U-AppWin。首次使用时由应用展示广告隐私授权提示。</li>
+                <li><strong>其他 App Store 地区：</strong>使用 Google AdMob，并通过 Google User Messaging Platform（UMP）根据当地法规判断是否需要征求同意或提供隐私选项。</li>
+                <li>广告服务可能处理设备信息、广告标识符、IP 地址、网络信息及广告互动信息，但不会接收您的尿酸记录或备注。</li>
+                <li><a href="https://www.umeng.com/page/policy" rel="noopener noreferrer">友盟隐私政策</a>；<a href="https://policies.google.com/privacy" rel="noopener noreferrer">Google 隐私政策</a>。</li>
+            </ul>
 
-        <h2>7. 数据安全</h2>
-        <p>数据安全由以下机制保护：</p>
-        <ul>
-            <li>iOS 系统级加密</li>
-            <li>您的设备密码/Face ID/Touch ID 保护</li>
-            <li>iCloud 数据受 Apple 隐私保护政策保护</li>
-            <li>分析事件采用 HTTPS 加密传输，并遵循最小必要原则</li>
-            <li>应用卸载时，本地数据将被完全删除</li>
-        </ul>
+            <h2>6. 数据保留与安全</h2>
+            <p>本地数据由您控制，可在应用内删除；卸载应用会删除设备上的本地数据。iCloud 数据由您的 Apple 账户管理。第三方服务处理的信息按照其配置、合同及隐私政策保留。数据传输使用 HTTPS 等行业通行的安全措施。</p>
 
-        <h2>8. 用户权利</h2>
-        <p>您对自己的数据拥有完全控制权：</p>
-        <ul>
-            <li>随时查看、添加、修改或删除记录</li>
-            <li>导出数据为 CSV 格式</li>
-            <li>开启或关闭 iCloud 同步功能</li>
-            <li>卸载应用以删除所有本地数据</li>
-            <li>通过下方邮箱联系我们，咨询或申请处理与匿名分析数据相关的事项</li>
-        </ul>
+            <h2>7. 您的选择与权利</h2>
+            <ul>
+                <li>查看、添加、修改、删除或导出自己的记录；</li>
+                <li>开启或关闭 iCloud 同步；</li>
+                <li>在中国大陆拒绝广告授权。拒绝后仍可使用本地记录功能，友盟广告 SDK 不会初始化；</li>
+                <li>在其他地区通过 Google 提供的隐私选项管理广告同意。Google 可能根据您的选择和当地法规提供受限或非个性化广告；</li>
+                <li>通过下方邮箱咨询或申请处理与分析信息相关的权利。</li>
+            </ul>
 
-        <h2>9. 隐私政策更新</h2>
-        <p>我们可能会不时更新本隐私政策。任何更改将在应用更新时通知您。建议您定期查看本页面以了解最新信息。</p>
+            <h2>8. 儿童隐私</h2>
+            <p>本应用不面向儿童提供定向服务，也不会明知收集儿童的健康记录或直接身份信息。如您认为儿童向我们提供了相关信息，请联系我们。</p>
 
-        <h2>10. 联系我们</h2>
-        <p>如果您对本隐私政策有任何疑问或建议，请通过以下方式联系我们：</p>
-        <ul>
-            <li>邮箱：lq.so@qq.com</li>
-        </ul>
+            <h2>9. 政策更新</h2>
+            <p>我们可能随功能、服务商或法规变化更新本政策。重大变化会通过应用或本页面说明。</p>
 
-        <div class="footer">
-            <p>最后更新日期：2026年8月30日</p>
-            <p>© 2026 尿酸记录. 保留所有权利。</p>
-        </div>
-    </div>
+            <h2>10. 联系我们</h2>
+            <p>如有隐私问题，请联系：<a href="mailto:lq.so@qq.com">lq.so@qq.com</a></p>
+            <footer>最后更新日期：2026 年 9 月 10 日<br>© 2026 尿酸记录</footer>
+        </article>
+
+        <article data-language="en">
+            <header>
+                <h1>Privacy Policy</h1>
+                <p class="subtitle">Uric Acid Log</p>
+            </header>
+            <p class="summary">Uric Acid Log is designed to keep your health records local. Uric acid readings, notes, and related health content remain on your device. They are synchronized through Apple CloudKit only when you enable iCloud sync.</p>
+
+            <h2>1. Information We Process</h2>
+            <p>We do not send uric acid readings, target values, measurement dates, record notes, gender settings, or other health content to analytics or advertising services.</p>
+            <p>To understand feature usage and improve the app, we process limited product analytics through PostHog, including:</p>
+            <ul>
+                <li>App launches, screen navigation, button taps, feature settings, and filter selections;</li>
+                <li>Basic technical information such as app version, operating system version, device type, app language, and time zone;</li>
+                <li>A random identifier generated by PostHog and the IP address that may be processed while handling network requests.</li>
+            </ul>
+            <p>We do not require your name, email address, or phone number for product analytics, and we do not intentionally associate analytics identifiers with your health records.</p>
+
+            <h2>2. Local Storage and iCloud</h2>
+            <ul>
+                <li><strong>Local storage:</strong> Health records are stored in the app database on your device.</li>
+                <li><strong>iCloud sync:</strong> When enabled, records are stored through Apple CloudKit in your private iCloud account and synchronized between your Apple devices. We cannot directly access your private CloudKit data.</li>
+                <li><strong>Disabling sync:</strong> You can turn off iCloud sync in the app settings at any time.</li>
+            </ul>
+
+            <h2>3. CSV Export</h2>
+            <p>You can export records as a CSV file. The file is saved or shared only to a location you select, and the app does not upload exported files to our servers.</p>
+
+            <h2>4. Product Analytics</h2>
+            <p>We use PostHog to understand aggregated product usage, verify installations, and troubleshoot problems. Product analytics is not controlled by your advertising consent choice.</p>
+            <ul>
+                <li>Analytics data may be processed by PostHog services in the United States;</li>
+                <li>Session Replay, automatic element capture, automatic screen capture, surveys, push subscription capture, and automatic error tracking are disabled;</li>
+                <li><a href="https://posthog.com/privacy" rel="noopener noreferrer">PostHog Privacy Policy</a>.</li>
+            </ul>
+
+            <h2>5. Advertising and Consent</h2>
+            <p>The advertising service is selected using the App Store region associated with the account that downloaded the app. Ad requests begin only after the applicable privacy notice or choice flow is completed:</p>
+            <ul>
+                <li><strong>China mainland App Store:</strong> Umeng U-AppWin is used. The app presents an advertising privacy notice before initialization.</li>
+                <li><strong>Other App Store regions:</strong> Google AdMob is used. Google User Messaging Platform (UMP) determines whether consent or privacy choices are required under local law.</li>
+                <li>Advertising services may process device information, advertising identifiers, IP addresses, network information, and ad interactions. They do not receive your uric acid records or notes.</li>
+                <li><a href="https://www.umeng.com/page/policy" rel="noopener noreferrer">Umeng Privacy Policy</a>; <a href="https://policies.google.com/privacy" rel="noopener noreferrer">Google Privacy Policy</a>.</li>
+            </ul>
+
+            <h2>6. Retention and Security</h2>
+            <p>You control locally stored records and can delete them in the app. Uninstalling the app removes its local data. iCloud data is managed through your Apple account. Information processed by third-party services is retained according to their configuration, agreements, and privacy policies. Industry-standard safeguards such as HTTPS are used for data transmission.</p>
+
+            <h2>7. Your Choices and Rights</h2>
+            <ul>
+                <li>View, add, edit, delete, or export your records;</li>
+                <li>Enable or disable iCloud sync;</li>
+                <li>In China mainland, decline advertising consent. Local record features remain available and the Umeng advertising SDK is not initialized;</li>
+                <li>In other regions, use Google's privacy options to manage advertising consent. Google may provide limited or non-personalized ads depending on your choices and applicable law;</li>
+                <li>Contact us to ask questions or exercise rights relating to analytics information.</li>
+            </ul>
+
+            <h2>8. Children's Privacy</h2>
+            <p>The app does not provide services targeted to children, and we do not knowingly collect children's health records or direct identifiers. Contact us if you believe a child has provided such information.</p>
+
+            <h2>9. Policy Updates</h2>
+            <p>We may update this policy when features, service providers, or legal requirements change. Material changes will be communicated through the app or this page.</p>
+
+            <h2>10. Contact Us</h2>
+            <p>For privacy questions, contact <a href="mailto:lq.so@qq.com">lq.so@qq.com</a>.</p>
+            <footer>Last updated: September 10, 2026<br>© 2026 Uric Acid Log</footer>
+        </article>
+    </main>
+
+    <script>
+        const articles = [...document.querySelectorAll('[data-language]')];
+        const buttons = [...document.querySelectorAll('[data-language-button]')];
+
+        function showLanguage(language) {
+            const selected = language.toLowerCase().startsWith('zh') ? 'zh-CN' : 'en';
+            document.documentElement.lang = selected;
+            document.title = selected === 'zh-CN' ? '隐私政策 - 尿酸记录' : 'Privacy Policy - Uric Acid Log';
+            articles.forEach(article => { article.style.display = article.dataset.language === selected ? 'block' : 'none'; });
+            buttons.forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.languageButton === selected)); });
+        }
+
+        buttons.forEach(button => button.addEventListener('click', () => showLanguage(button.dataset.languageButton)));
+        showLanguage((navigator.languages && navigator.languages[0]) || navigator.language || 'en');
+    </script>
 </body>
 </html>

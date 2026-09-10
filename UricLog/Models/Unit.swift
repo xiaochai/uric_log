@@ -1,4 +1,15 @@
 import Foundation
+import StoreKit
+
+enum AppStoreRegion {
+	static var countryCode: String? {
+		SKPaymentQueue.default().storefront?.countryCode
+	}
+
+	static var isMainlandChina: Bool {
+		countryCode == "CHN"
+	}
+}
 
 enum UricUnit: String, CaseIterable, Identifiable, Codable {
 	case umolL
