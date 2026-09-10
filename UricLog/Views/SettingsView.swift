@@ -20,6 +20,8 @@ struct SettingsView: View {
 	@State private var exportURL: URL?
 	@State private var exportError: String?
 	@State private var showingRestartHint = false
+	@State private var showingHiddenSettings = false
+	@State private var versionTapCount = 0
 	@State private var lastPreferredUnitRawValue: String = UricUnit.umolL.rawValue
 
 	init() {}
@@ -48,6 +50,9 @@ struct SettingsView: View {
 		}
 		.background(Color(.systemGroupedBackground))
 		.navigationTitle("设置")
+		.sheet(isPresented: $showingHiddenSettings) {
+			HiddenSettingsView()
+		}
 			.alert("需要重启", isPresented: $showingRestartHint) {
 				Button("知道了") {
 					Analytics.track("icloud_restart_hint_acknowledged")
@@ -416,6 +421,14 @@ struct SettingsView: View {
 					Spacer()
 				}
 				.padding(.vertical, 12)
+				.contentShape(Rectangle())
+				.onTapGesture {
+					versionTapCount += 1
+					if versionTapCount >= 5 {
+						versionTapCount = 0
+						showingHiddenSettings = true
+					}
+				}
 			}
 		}
 		.padding()
@@ -449,6 +462,96 @@ struct SettingsView: View {
 	private func filterRecords(records: [UricAcidRecordEntity], range: TimeRange) -> [UricAcidRecordEntity] {
 		guard let start = range.startDate() else { return records }
 		return records.filter { $0.measuredAt >= start }
+	}
+}
+
+private struct HiddenSettingsView: View {
+	@Environment(\.dismiss) private var dismiss
+	@AppStorage(AppSettingsKey.adProviderOverride) private var adProviderRawValue = AdProviderPreference.automatic.rawValue
+	@State private var showingPrivacyResetConfirmation = false
+	@State private var showingAdResetConfirmation = false
+	@State private var showingAdMobPrivacyResetConfirmation = false
+
+	var body: some View {
+		NavigationStack {
+			List {
+				Section {
+					Picker("广告提供方", selection: $adProviderRawValue) {
+						ForEach(AdProviderPreference.allCases) { provider in
+							Text(provider.displayName).tag(provider.rawValue)
+						}
+					}
+					.pickerStyle(.segmented)
+				} header: {
+					Text("广告提供方测试")
+				} footer: {
+					Text("默认模式：中国大陆 App Store 使用友盟，其他地区使用 AdMob。切换后请重新启动 App。")
+				}
+
+				Section {
+					Button {
+						showingPrivacyResetConfirmation = true
+					} label: {
+						Label("重置隐私授权", systemImage: "hand.raised")
+					}
+
+					Button {
+						showingAdResetConfirmation = true
+					} label: {
+						Label("重置广告展示", systemImage: "rectangle.badge.xmark")
+					}
+
+					#if DEBUG
+					Button {
+						showingAdMobPrivacyResetConfirmation = true
+					} label: {
+						Label("测试 AdMob 隐私弹窗", systemImage: "hand.raised.square")
+					}
+					#endif
+				} footer: {
+					Text("重置后请彻底关闭并重新打开 App。尿酸记录和设置不会被删除。")
+				}
+			}
+			.navigationTitle("内部设置")
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .confirmationAction) {
+					Button("完成") { dismiss() }
+				}
+			}
+			.confirmationDialog(
+				"确认重置隐私授权？",
+				isPresented: $showingPrivacyResetConfirmation,
+				titleVisibility: .visible
+			) {
+				Button("重置隐私授权", role: .destructive) {
+					UserDefaults.standard.removeObject(forKey: AppSettingsKey.privacyConsentGranted)
+					UserDefaults.standard.removeObject(forKey: AppSettingsKey.privacyConsentChoiceMade)
+					dismiss()
+				}
+			}
+			.confirmationDialog(
+				"下次启动时模拟欧洲地区并显示 AdMob 隐私弹窗？",
+				isPresented: $showingAdMobPrivacyResetConfirmation,
+				titleVisibility: .visible
+			) {
+				Button("重置并退出设置", role: .destructive) {
+					adProviderRawValue = AdProviderPreference.admob.rawValue
+					AppOpenAdManager.shared.resetAdMobPrivacyConsentForTesting()
+					dismiss()
+				}
+			}
+			.confirmationDialog(
+				"确认重置今日广告展示记录？",
+				isPresented: $showingAdResetConfirmation,
+				titleVisibility: .visible
+			) {
+				Button("重置广告展示", role: .destructive) {
+					AppOpenAdManager.shared.resetDailyExposure()
+					dismiss()
+				}
+			}
+		}
 	}
 }
 

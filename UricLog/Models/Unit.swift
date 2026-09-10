@@ -35,6 +35,11 @@ enum AppSettingsKey {
 	static let targetEnabled = "targetEnabled"
 	static let targetValue = "targetValue"
 	static let iCloudEnabled = "iCloudEnabled"
+	static let privacyConsentGranted = "privacyConsentGranted"
+	static let privacyConsentChoiceMade = "privacyConsentChoiceMade"
+	static let lastAppOpenAdExposureDate = "lastAppOpenAdExposureDate"
+	static let adProviderOverride = "adProviderOverride"
+	static let admobConsentTestMode = "admobConsentTestMode"
 
 	static let legacyKeys = [
 		preferredUnit,
@@ -43,6 +48,22 @@ enum AppSettingsKey {
 		targetValue,
 		iCloudEnabled,
 	]
+}
+
+enum AdProviderPreference: String, CaseIterable, Identifiable {
+	case automatic
+	case admob
+	case umeng
+
+	var id: String { rawValue }
+
+	var displayName: String {
+		switch self {
+		case .automatic: return L10n.string("默认（按 App Store 地区）")
+		case .admob: return "AdMob"
+		case .umeng: return L10n.string("友盟")
+		}
+	}
 }
 
 enum UserGender: String, CaseIterable, Identifiable, Codable {

@@ -1,30 +1,18 @@
 import SwiftUI
 import CoreData
-import PostHog
 
 @main
 struct UricLogApp: App {
+	@Environment(\.scenePhase) private var scenePhase
 	@AppStorage(AppSettingsKey.appLanguage) private var appLanguageRawValue = AppLanguage.simplifiedChinese.rawValue
 	@StateObject private var persistenceController: PersistenceController
 	@StateObject private var iCloudSettingsSync = ICloudSettingsSync()
+	@State private var backgroundEnteredAt: Date?
 
 	init() {
 		AppLanguage.initializeIfNeeded()
-
-		let postHogConfig = PostHogConfig(
-			projectToken: "phc_rufq8pYVnivNQ6Bw7gybU48Bby8JtEmUoG2GqgSjXcci",
-			host: "https://us.i.posthog.com"
-		)
-		postHogConfig.captureScreenViews = false
-		postHogConfig.captureElementInteractions = false
-		postHogConfig.sessionReplay = false
-		postHogConfig.surveys = false
-		postHogConfig.errorTrackingConfig.autoCapture = false
-		postHogConfig.capturePushNotificationSubscriptions = false
-		postHogConfig.capturePushNotificationOpened = false
-		PostHogSDK.shared.setup(postHogConfig)
-		PostHogSDK.shared.capture("app_launched")
-		PostHogSDK.shared.flush()
+		Analytics.start()
+		AppOpenAdManager.shared.startIfAllowed()
 
 		let iCloudEnabled = UserDefaults.standard.bool(forKey: AppSettingsKey.iCloudEnabled)
 		_persistenceController = StateObject(wrappedValue: PersistenceController(iCloudEnabled: iCloudEnabled))
@@ -32,7 +20,8 @@ struct UricLogApp: App {
 
 	var body: some Scene {
 		WindowGroup {
-			DailySplashContainer {
+			PrivacyConsentContainer {
+				DailySplashContainer {
 				Group {
 					if persistenceController.isLoaded {
 						RootTabView()
@@ -59,8 +48,28 @@ struct UricLogApp: App {
 					Text(persistenceController.loadErrorMessage ?? "")
 					}
 				.id(appLanguageRawValue)
+				}
 			}
 			.environment(\.locale, appLanguage.locale)
+			.onChange(of: scenePhase) { _, newPhase in
+				handleScenePhaseChange(newPhase)
+			}
+		}
+	}
+
+	private func handleScenePhaseChange(_ newPhase: ScenePhase) {
+		switch newPhase {
+		case .background:
+			backgroundEnteredAt = Date()
+		case .active:
+			guard let backgroundEnteredAt,
+				Date().timeIntervalSince(backgroundEnteredAt) >= 10 else {
+				return
+			}
+			self.backgroundEnteredAt = nil
+			AppOpenAdManager.shared.attemptForegroundPresentation()
+		default:
+			break
 		}
 	}
 

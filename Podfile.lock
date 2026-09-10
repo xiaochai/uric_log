@@ -1,0 +1,34 @@
+PODS:
+  - Google-Mobile-Ads-SDK (13.9.0):
+    - GoogleUserMessagingPlatform (>= 1.1)
+  - GoogleUserMessagingPlatform (3.1.0)
+  - UMCommon (7.6.7):
+    - UMDevice
+  - UMDevice (3.6.0)
+  - UMUnionSDK (3.7.0):
+    - UMCommon
+
+DEPENDENCIES:
+  - Google-Mobile-Ads-SDK
+  - UMCommon
+  - UMDevice
+  - UMUnionSDK
+
+SPEC REPOS:
+  trunk:
+    - Google-Mobile-Ads-SDK
+    - GoogleUserMessagingPlatform
+    - UMCommon
+    - UMDevice
+    - UMUnionSDK
+
+SPEC CHECKSUMS:
+  Google-Mobile-Ads-SDK: cec761d0da669c462bcc19cd16c747498b9f39f7
+  GoogleUserMessagingPlatform: befe603da6501006420c206222acd449bba45a9c
+  UMCommon: 52e6de716b16e9ea2167971ef013385254ea2d3a
+  UMDevice: 20b7b3c37a36b2c5c7ca8b5a54386ff9ed2b3b19
+  UMUnionSDK: 6495255af062174ec4a5bd4660510c2bee2cd2e9
+
+PODFILE CHECKSUM: 5183a7a6591735b5006811d86b4f3bde2e05fd80
+
+COCOAPODS: 1.17.0

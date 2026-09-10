@@ -37,9 +37,10 @@
 
 ## 本地运行
 
-1. 用 Xcode 打开 `UricLog.xcodeproj`
-2. 选择 `UricLog` scheme
-3. 运行到模拟器或真机
+1. 安装依赖：`pod install`
+2. 用 Xcode 打开 `UricLog.xcworkspace`
+3. 选择 `UricLog` scheme
+4. 运行到模拟器或真机
 
 ## iCloud 同步说明
 
@@ -55,4 +56,3 @@
 ## 免责声明
 
 本应用仅用于个人记录与参考，不构成医疗建议或诊断依据。如有异常请咨询专业医生。
-

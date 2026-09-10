@@ -7,6 +7,14 @@
 - 只允许使用本文档列出的枚举属性。
 - Session Replay、控件自动采集和自动页面采集保持关闭。
 
+## 公共属性
+
+所有通过 PostHog 发送的事件都包含以下属性：
+
+| 属性 | 取值 | 说明 |
+| --- | --- | --- |
+| `environment` | `debug` / `production` | Xcode Debug 构建使用 `debug`，Release、TestFlight 和 App Store 构建使用 `production` |
+
 ## 公共事件
 
 | 事件 | 触发时机 | 属性 |

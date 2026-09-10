@@ -24,11 +24,17 @@
 		A1B2C3D4E5F6010203040B01 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6010203040B03 /* PostHog */; };
 		A1B2C3D4E5F6010203040C02 /* Analytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040C01 /* Analytics.swift */; };
 		A1B2C3D4E5F6010203040D02 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040D01 /* Localization.swift */; };
-		A1B2C3D4E5F6010203040F02 /* DailySplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */; };
 		A1B2C3D4E5F6010203040E02 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040E01 /* Localizable.strings */; };
+		A1B2C3D4E5F6010203040F02 /* DailySplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */; };
+		A1B2C3D4E5F6010203041102 /* AppOpenAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203041101 /* AppOpenAdManager.swift */; };
+		A1B2C3D4E5F6010203041302 /* PrivacyConsentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203041301 /* PrivacyConsentView.swift */; };
+		FB2C1579ABD51122ABEE4306 /* libPods-UricLog.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6465FB09E23B4E7DB06276 /* libPods-UricLog.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1C6465FB09E23B4E7DB06276 /* libPods-UricLog.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-UricLog.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		297F84342601D8D366355D0A /* Pods-UricLog.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UricLog.release.xcconfig"; path = "Target Support Files/Pods-UricLog/Pods-UricLog.release.xcconfig"; sourceTree = "<group>"; };
+		4BF7AFE14D05216A79CFFC5E /* Pods-UricLog.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-UricLog.debug.xcconfig"; path = "Target Support Files/Pods-UricLog/Pods-UricLog.debug.xcconfig"; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040507 /* UricLogApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UricLogApp.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040509 /* UricAcidRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UricAcidRecord.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F601020304050B /* Unit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Unit.swift; sourceTree = "<group>"; };
@@ -47,9 +53,12 @@
 		A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ICloudSettingsSync.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040C01 /* Analytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Analytics.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040D01 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
-		A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySplashView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040E03 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203040E04 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailySplashView.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203041101 /* AppOpenAdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpenAdManager.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203041201 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203041301 /* PrivacyConsentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConsentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,17 +67,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1B2C3D4E5F6010203040B01 /* PostHog in Frameworks */,
+				FB2C1579ABD51122ABEE4306 /* libPods-UricLog.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1C64B3873F8043B2A1F159DE /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4BF7AFE14D05216A79CFFC5E /* Pods-UricLog.debug.xcconfig */,
+				297F84342601D8D366355D0A /* Pods-UricLog.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		A1B2C3D4E5F6010203040540 = {
 			isa = PBXGroup;
 			children = (
 				A1B2C3D4E5F6010203040541 /* UricLog */,
 				A1B2C3D4E5F6010203040542 /* Products */,
+				1C64B3873F8043B2A1F159DE /* Pods */,
+				DD2076025ED6ED2B10F39718 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,6 +101,7 @@
 				A1B2C3D4E5F6010203040601 /* Assets.xcassets */,
 				A1B2C3D4E5F6010203040E01 /* Localizable.strings */,
 				A1B2C3D4E5F6010203040801 /* UricLog.entitlements */,
+				A1B2C3D4E5F6010203041201 /* Info.plist */,
 				A1B2C3D4E5F6010203040543 /* Models */,
 				A1B2C3D4E5F6010203040544 /* Persistence */,
 				A1B2C3D4E5F6010203040545 /* Views */,
@@ -117,6 +140,7 @@
 			isa = PBXGroup;
 			children = (
 				A1B2C3D4E5F6010203040F01 /* DailySplashView.swift */,
+				A1B2C3D4E5F6010203041301 /* PrivacyConsentView.swift */,
 				A1B2C3D4E5F601020304050F /* RootTabView.swift */,
 				A1B2C3D4E5F6010203040511 /* RecordsListView.swift */,
 				A1B2C3D4E5F6010203040513 /* RecordEditorView.swift */,
@@ -133,9 +157,18 @@
 				A1B2C3D4E5F6010203040611 /* DateFormatter.swift */,
 				A1B2C3D4E5F6010203040A01 /* ICloudSettingsSync.swift */,
 				A1B2C3D4E5F6010203040C01 /* Analytics.swift */,
+				A1B2C3D4E5F6010203041101 /* AppOpenAdManager.swift */,
 				A1B2C3D4E5F6010203040D01 /* Localization.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		DD2076025ED6ED2B10F39718 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1C6465FB09E23B4E7DB06276 /* libPods-UricLog.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -145,9 +178,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A1B2C3D4E5F6010203040551 /* Build configuration list for PBXNativeTarget "UricLog" */;
 			buildPhases = (
+				A394CDCE834F3A1EF17140C2 /* [CP] Check Pods Manifest.lock */,
 				A1B2C3D4E5F6010203040552 /* Sources */,
 				A1B2C3D4E5F6010203040530 /* Frameworks */,
 				A1B2C3D4E5F6010203040553 /* Resources */,
+				B16AF7AE9D8B53AB6BD0DBE4 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -210,6 +245,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A394CDCE834F3A1EF17140C2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-UricLog-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B16AF7AE9D8B53AB6BD0DBE4 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-UricLog/Pods-UricLog-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-UricLog/Pods-UricLog-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-UricLog/Pods-UricLog-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A1B2C3D4E5F6010203040552 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -229,8 +306,10 @@
 				A1B2C3D4E5F6010203040610 /* DateFormatter.swift in Sources */,
 				A1B2C3D4E5F6010203040A02 /* ICloudSettingsSync.swift in Sources */,
 				A1B2C3D4E5F6010203040C02 /* Analytics.swift in Sources */,
+				A1B2C3D4E5F6010203041102 /* AppOpenAdManager.swift in Sources */,
 				A1B2C3D4E5F6010203040D02 /* Localization.swift in Sources */,
 				A1B2C3D4E5F6010203040F02 /* DailySplashView.swift in Sources */,
+				A1B2C3D4E5F6010203041302 /* PrivacyConsentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -251,7 +330,9 @@
 /* Begin XCBuildConfiguration section */
 		A1B2C3D4E5F6010203040570 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4BF7AFE14D05216A79CFFC5E /* Pods-UricLog.debug.xcconfig */;
 			buildSettings = {
+				ADMOB_APP_ID = "ca-app-pub-3940256099942544~1458002511";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -287,8 +368,10 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N49M3Z72D3;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = x86_64;
-				GENERATE_INFOPLIST_FILE = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UricLog/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "尿酸记录";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -307,6 +390,7 @@
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -315,7 +399,9 @@
 		};
 		A1B2C3D4E5F6010203040571 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 297F84342601D8D366355D0A /* Pods-UricLog.release.xcconfig */;
 			buildSettings = {
+				ADMOB_APP_ID = "ca-app-pub-7908959231552914~5056259782";
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -350,7 +436,9 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N49M3Z72D3;
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = UricLog/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "尿酸记录";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

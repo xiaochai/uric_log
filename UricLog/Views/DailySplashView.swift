@@ -18,7 +18,20 @@ struct DailySplashContainer<Content: View>: View {
 					.transition(.opacity)
 					.task {
 						Analytics.track("launch_splash_shown")
-						try? await Task.sleep(for: .milliseconds(1_500))
+						try? await Task.sleep(for: .seconds(1))
+
+						let deadline = ContinuousClock.now + .seconds(2)
+						var didPresentAd = AppOpenAdManager.shared.presentIfAvailable()
+						while !didPresentAd,
+							AppOpenAdManager.shared.isWaitingForLoad,
+							ContinuousClock.now < deadline {
+							try? await Task.sleep(for: .milliseconds(100))
+							didPresentAd = AppOpenAdManager.shared.presentIfAvailable()
+						}
+
+						if !didPresentAd {
+							Analytics.track("app_open_ad_not_ready")
+						}
 						withAnimation(.easeOut(duration: 0.15)) {
 							isShowingSplash = false
 						}
@@ -88,7 +101,7 @@ private struct DailySplashView: View {
 			withAnimation(.spring(response: 0.38, dampingFraction: 0.72)) {
 				dropSettled = true
 			}
-			withAnimation(.easeOut(duration: 1.32).delay(0.18)) {
+			withAnimation(.easeOut(duration: 0.82).delay(0.18)) {
 				lineProgress = 1
 			}
 			withAnimation(.easeOut(duration: 0.28).delay(0.22)) {
