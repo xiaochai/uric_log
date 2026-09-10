@@ -4,6 +4,7 @@ import CoreData
 struct RecordEditorView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
+	@FocusState private var focusedField: FocusField?
 
     @AppStorage(AppSettingsKey.preferredUnit) private var preferredUnitRawValue = UricUnit.umolL.rawValue
     @AppStorage(AppSettingsKey.userGender) private var userGenderRawValue = UserGender.male.rawValue
@@ -16,7 +17,13 @@ struct RecordEditorView: View {
     @State private var note: String = ""
     @State private var showingExtremeConfirm = false
     @State private var showingReferenceInfo = false
+	@State private var showingDatePicker = false
     @State private var pendingSaveValue: Double?
+
+	private enum FocusField: Hashable {
+		case value
+		case note
+	}
 
     init(record: UricAcidRecordEntity?) {
         self.record = record
@@ -41,7 +48,12 @@ struct RecordEditorView: View {
                 saveButton
             }
             .padding()
+			.contentShape(Rectangle())
+			.onTapGesture {
+				focusedField = nil
+			}
         }
+		.scrollDismissesKeyboard(.interactively)
         .background(Color(.systemGroupedBackground))
         .navigationTitle(L10n.string(record == nil ? "新增记录" : "编辑记录"))
         .navigationBarTitleDisplayMode(.large)
@@ -71,6 +83,11 @@ struct RecordEditorView: View {
         .sheet(isPresented: $showingReferenceInfo) {
             ReferenceInfoSheet()
         }
+		.sheet(isPresented: $showingDatePicker) {
+			measurementTimePicker
+				.presentationDetents([.large])
+				.presentationDragIndicator(.visible)
+		}
         .onAppear {
             selectedUnit = UricUnit(rawValue: preferredUnitRawValue) ?? .umolL
             if let record {
@@ -98,6 +115,7 @@ struct RecordEditorView: View {
             HStack(spacing: 12) {
                 TextField("输入数值", text: $valueText)
                     .keyboardType(.decimalPad)
+					.focused($focusedField, equals: .value)
                     .font(.system(size: 36, weight: .bold, design: .rounded))
                     .multilineTextAlignment(.center)
                     .frame(height: 60)
@@ -109,6 +127,7 @@ struct RecordEditorView: View {
                 VStack(spacing: 8) {
 	                    ForEach(UricUnit.allCases) { unit in
 	                        Button {
+							focusedField = nil
 	                            Analytics.track("record_unit_selected", properties: ["unit": unit.rawValue])
 	                            selectedUnit = unit
                         } label: {
@@ -181,22 +200,6 @@ struct RecordEditorView: View {
                     .fill(Color.cyan.opacity(0.08))
             )
             
-            // 正常范围说明
-            HStack(spacing: 12) {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                    .font(.title3)
-                
-                Text("正常范围")
-                    .font(.system(size: 15, weight: .medium))
-                
-                Spacer()
-                
-                Text(userGender.normalRangeText(unit: selectedUnit))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            .padding(.top, 4)
         }
         .padding()
         .background(
@@ -269,17 +272,26 @@ struct RecordEditorView: View {
                 Spacer()
             }
             
-            // 显示当前选择的时间（中文格式）
-            Text(measuredAt.chineseDateTime)
-                .font(.system(size: 18, weight: .medium))
-                .foregroundStyle(.primary)
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.vertical, 8)
-            
-            DatePicker("", selection: $measuredAt)
-                .datePickerStyle(.wheel)
-                .labelsHidden()
-                .frame(height: 180)
+			Button {
+				focusedField = nil
+				showingDatePicker = true
+			} label: {
+				HStack(spacing: 12) {
+					Text(measuredAt.chineseDateTime)
+						.font(.system(size: 17, weight: .medium))
+						.foregroundStyle(.primary)
+					Spacer()
+					Image(systemName: "chevron.right")
+						.font(.caption)
+						.foregroundStyle(.tertiary)
+				}
+				.padding(14)
+				.background(
+					RoundedRectangle(cornerRadius: 10)
+						.fill(Color(.systemBackground))
+				)
+			}
+			.buttonStyle(.plain)
         }
         .padding()
         .background(
@@ -307,6 +319,7 @@ struct RecordEditorView: View {
             }
             
             TextField("添加备注（如：空腹、餐后、用药后等）", text: $note, axis: .vertical)
+				.focused($focusedField, equals: .note)
                 .lineLimit(3...5)
                 .padding()
                 .background(
@@ -321,6 +334,90 @@ struct RecordEditorView: View {
                 .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
         )
     }
+
+	private var measurementTimePicker: some View {
+		NavigationStack {
+			ScrollView {
+				VStack(spacing: 16) {
+				Text(measuredAt.chineseDateTime)
+					.font(.system(size: 17, weight: .semibold))
+					.foregroundStyle(.primary)
+					.padding(.top, 4)
+
+				HStack(spacing: 12) {
+					quickDateButton("今天", dayOffset: 0)
+					quickDateButton("昨天", dayOffset: -1)
+				}
+
+				DatePicker(
+					"日期",
+					selection: $measuredAt,
+					displayedComponents: .date
+				)
+				.datePickerStyle(.graphical)
+				.labelsHidden()
+				.frame(maxWidth: .infinity)
+
+				HStack {
+					Text("时间")
+						.font(.headline)
+					Spacer()
+				}
+
+				DatePicker(
+					"时间",
+					selection: $measuredAt,
+					displayedComponents: .hourAndMinute
+				)
+				.datePickerStyle(.wheel)
+				.labelsHidden()
+				.frame(height: 150)
+				.clipped()
+				}
+				.padding(.horizontal)
+			}
+			.navigationTitle("测量时间")
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("现在") {
+						measuredAt = Date()
+					}
+				}
+				ToolbarItem(placement: .confirmationAction) {
+					Button("完成") {
+						showingDatePicker = false
+					}
+				}
+			}
+		}
+	}
+
+	private func quickDateButton(_ title: LocalizedStringKey, dayOffset: Int) -> some View {
+		Button {
+			let calendar = Calendar.current
+			guard let targetDay = calendar.date(byAdding: .day, value: dayOffset, to: Date()) else { return }
+			let day = calendar.dateComponents([.year, .month, .day], from: targetDay)
+			let time = calendar.dateComponents([.hour, .minute], from: measuredAt)
+			var components = DateComponents()
+			components.year = day.year
+			components.month = day.month
+			components.day = day.day
+			components.hour = time.hour
+			components.minute = time.minute
+			if let date = calendar.date(from: components) {
+				measuredAt = date
+			}
+		} label: {
+			Text(title)
+				.font(.subheadline.weight(.semibold))
+				.frame(maxWidth: .infinity)
+				.padding(.vertical, 10)
+				.background(Color.blue.opacity(0.1))
+				.clipShape(RoundedRectangle(cornerRadius: 8))
+		}
+		.buttonStyle(.plain)
+	}
     
     private var saveButton: some View {
         Button {

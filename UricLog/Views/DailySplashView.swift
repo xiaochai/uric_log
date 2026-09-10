@@ -30,7 +30,9 @@ struct DailySplashContainer<Content: View>: View {
 						}
 
 						if !didPresentAd {
-							Analytics.track("app_open_ad_not_ready")
+							Analytics.track("app_open_ad_not_ready", properties: [
+								"waiting_for_load": AppOpenAdManager.shared.isWaitingForLoad,
+							])
 						}
 						withAnimation(.easeOut(duration: 0.15)) {
 							isShowingSplash = false

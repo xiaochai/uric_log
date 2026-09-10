@@ -11,8 +11,7 @@ struct TrendsView: View {
 	@AppStorage(AppSettingsKey.targetEnabled) private var targetEnabled = false
 	@AppStorage(AppSettingsKey.targetValue) private var targetValue: Double = 420
 	@AppStorage(AppSettingsKey.userGender) private var userGenderRawValue = UserGender.male.rawValue
-
-	@State private var timeRange: TimeRange = .days30
+	@AppStorage(AppSettingsKey.selectedTimeRange) private var timeRangeRawValue = TimeRange.days30.rawValue
 
 	init() {}
 
@@ -48,7 +47,7 @@ struct TrendsView: View {
 				Spacer()
 			}
 			
-			Picker("范围", selection: $timeRange) {
+			Picker("范围", selection: timeRangeSelection) {
 				ForEach(TimeRange.allCases) { range in
 					Text(range.displayName).tag(range)
 				}
@@ -56,6 +55,7 @@ struct TrendsView: View {
 			.pickerStyle(.segmented)
 		}
 		.padding()
+		.frame(minHeight: 108)
 		.background(
 			RoundedRectangle(cornerRadius: 16)
 				.fill(Color(.secondarySystemGroupedBackground))
@@ -316,6 +316,17 @@ struct TrendsView: View {
 		UricUnit(rawValue: preferredUnitRawValue) ?? .umolL
 	}
 
+	private var timeRange: TimeRange {
+		TimeRange(rawValue: timeRangeRawValue) ?? .days30
+	}
+
+	private var timeRangeSelection: Binding<TimeRange> {
+		Binding(
+			get: { timeRange },
+			set: { timeRangeRawValue = $0.rawValue }
+		)
+	}
+
 	private var filteredPoints: [TrendPoint] {
 		let source = Array(records)
 		let filtered: [UricAcidRecordEntity]
@@ -369,12 +380,12 @@ struct TrendsView: View {
 	}
 
 	private func formatValue(_ value: Double) -> String {
-		"\(String(format: "%.0f", value))"
+		value.formatted(.number.precision(.fractionLength(0...4)))
 	}
 
 	private func formatDelta(_ delta: Double) -> String {
 		let sign = delta > 0 ? "+" : ""
-		return "\(sign)\(String(format: "%.0f", delta))"
+		return "\(sign)\(delta.formatted(.number.precision(.fractionLength(0...4))))"
 	}
 }
 

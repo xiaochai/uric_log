@@ -38,7 +38,13 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 
 	func startIfAllowed() {
 		let resolvedProvider = resolveProvider()
-		guard isAdvertisingAllowed(for: resolvedProvider) else { return }
+		guard isAdvertisingAllowed(for: resolvedProvider) else {
+			Analytics.track("app_open_ad_skipped", properties: [
+				"provider": resolvedProvider.rawValue,
+				"reason": "privacy_consent_required",
+			])
+			return
+		}
 		guard provider == nil || provider == resolvedProvider else {
 			Self.logger.info("Ad provider change will apply after the next app launch")
 			return
@@ -149,6 +155,7 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 	private func load() {
 		guard !isLoading, umengAd == nil, admobAd == nil, let provider else { return }
 		isLoading = true
+		Analytics.track("app_open_ad_load_started", properties: ["provider": provider.rawValue])
 
 		switch provider {
 		case .umeng:
@@ -184,6 +191,7 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 		hasRequestedAdMobConsent = true
 		isLoading = true
 		shouldPresentWhenLoaded = true
+		Analytics.track("app_open_ad_consent_started", properties: ["provider": "admob"])
 
 		let parameters = RequestParameters()
 		#if DEBUG
@@ -215,8 +223,13 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 						guard ConsentInformation.shared.canRequestAds else {
 							self.isLoading = false
 							Self.logger.info("AdMob consent does not allow ad requests")
+							Analytics.track("app_open_ad_skipped", properties: [
+								"provider": "admob",
+								"reason": "ump_cannot_request_ads",
+							])
 							return
 						}
+						Analytics.track("app_open_ad_consent_completed", properties: ["provider": "admob"])
 						MobileAds.shared.start(completionHandler: nil)
 						self.isLoading = false
 						if !self.hasDisplayedToday { self.load() }

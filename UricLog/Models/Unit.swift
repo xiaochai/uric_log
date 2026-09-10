@@ -45,6 +45,7 @@ enum AppSettingsKey {
 	static let userGender = "userGender"
 	static let targetEnabled = "targetEnabled"
 	static let targetValue = "targetValue"
+	static let selectedTimeRange = "selectedTimeRange"
 	static let iCloudEnabled = "iCloudEnabled"
 	static let privacyConsentGranted = "privacyConsentGranted"
 	static let privacyConsentChoiceMade = "privacyConsentChoiceMade"

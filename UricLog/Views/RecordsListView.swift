@@ -7,24 +7,23 @@ struct RecordsListView: View {
         sortDescriptors: [NSSortDescriptor(keyPath: \UricAcidRecordEntity.measuredAt, ascending: false)]
     ) private var records: FetchedResults<UricAcidRecordEntity>
 	@AppStorage(AppSettingsKey.userGender) private var userGenderRawValue = UserGender.male.rawValue
+	@AppStorage(AppSettingsKey.preferredUnit) private var preferredUnitRawValue = UricUnit.umolL.rawValue
+	@AppStorage(AppSettingsKey.selectedTimeRange) private var timeRangeRawValue = TimeRange.days30.rawValue
 
-    @State private var timeRange: TimeRange = .days30
-    @State private var showingEditor = false
-    @State private var editingRecord: UricAcidRecordEntity?
+    @State private var editorDestination: RecordEditorDestination?
 
     init() {}
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16) {
+            VStack(spacing: 20) {
                 // 时间范围选择器
                 timeRangePicker
                 
                 // 记录列表
                 recordsSection
             }
-            .padding(.horizontal)
-            .padding(.top, 8)
+            .padding()
         }
         .background(Color(.systemGroupedBackground))
         .navigationTitle("尿酸记录")
@@ -32,41 +31,44 @@ struct RecordsListView: View {
 	            ToolbarItem(placement: .topBarTrailing) {
 	                Button {
 	                    Analytics.track("record_add_tapped")
-	                    editingRecord = nil
-                    showingEditor = true
+	                    editorDestination = RecordEditorDestination(record: nil)
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.blue)
+					Image(systemName: "plus.circle.fill")
+						.font(.title3)
+						.foregroundStyle(.blue)
                 }
+				.scaleEffect(1.3)
             }
         }
-        .sheet(isPresented: $showingEditor) {
+        .sheet(item: $editorDestination) { destination in
             NavigationStack {
-                RecordEditorView(record: editingRecord)
+                RecordEditorView(record: destination.record)
             }
         }
     }
     
-    private var timeRangePicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("时间范围")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .padding(.leading, 4)
+	private var timeRangePicker: some View {
+		VStack(alignment: .leading, spacing: 12) {
+			HStack {
+				Image(systemName: "calendar")
+					.foregroundStyle(.blue)
+				Text("时间范围")
+					.font(.system(size: 17, weight: .semibold))
+				Spacer()
+			}
             
-            Picker("范围", selection: $timeRange) {
+            Picker("范围", selection: timeRangeSelection) {
                 ForEach(TimeRange.allCases) { range in
                     Text(range.displayName).tag(range)
                 }
             }
-	            .pickerStyle(.segmented)
-	            .padding(.horizontal, 4)
+			.pickerStyle(.segmented)
 			.onChange(of: timeRange) { _, newValue in
 				Analytics.track("records_range_changed", properties: ["range": newValue.rawValue])
 			}
         }
         .padding()
+		.frame(minHeight: 108)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.secondarySystemGroupedBackground))
@@ -77,9 +79,10 @@ struct RecordsListView: View {
     private var recordsSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Label("记录列表", systemImage: "list.bullet.clipboard")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+				Image(systemName: "list.bullet.clipboard")
+					.foregroundStyle(.blue)
+				Text("记录列表")
+					.font(.system(size: 17, weight: .semibold))
                 
                 Spacer()
                 
@@ -100,7 +103,7 @@ struct RecordsListView: View {
             } else {
                 LazyVStack(spacing: 12) {
 					ForEach(filteredRecords.map(UricAcidRecordSnapshot.init(record:)), id: \.id) { snapshot in
-						RecordCard(record: snapshot, userGender: userGender) {
+						RecordCard(record: snapshot, displayUnit: preferredUnit, userGender: userGender) {
 							edit(objectID: snapshot.id)
 						} onDelete: {
 							delete(objectID: snapshot.id)
@@ -113,6 +116,21 @@ struct RecordsListView: View {
 
 	private var userGender: UserGender {
 		UserGender(rawValue: userGenderRawValue) ?? .male
+	}
+
+	private var preferredUnit: UricUnit {
+		UricUnit(rawValue: preferredUnitRawValue) ?? .umolL
+	}
+
+	private var timeRange: TimeRange {
+		TimeRange(rawValue: timeRangeRawValue) ?? .days30
+	}
+
+	private var timeRangeSelection: Binding<TimeRange> {
+		Binding(
+			get: { timeRange },
+			set: { timeRangeRawValue = $0.rawValue }
+		)
 	}
     
     private var emptyStateView: some View {
@@ -143,11 +161,10 @@ struct RecordsListView: View {
         return records.filter { $0.measuredAt >= start }
     }
 
-		private func edit(objectID: NSManagedObjectID) {
-			if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
-				Analytics.track("record_opened")
-			editingRecord = record
-			showingEditor = true
+	private func edit(objectID: NSManagedObjectID) {
+		if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
+			Analytics.track("record_opened")
+			editorDestination = RecordEditorDestination(record: record)
 		}
 	}
 
@@ -158,6 +175,11 @@ struct RecordsListView: View {
 				Analytics.track("record_deleted")
 		}
 	}
+}
+
+private struct RecordEditorDestination: Identifiable {
+	let id = UUID()
+	let record: UricAcidRecordEntity?
 }
 
 // MARK: - Record Card
@@ -179,6 +201,7 @@ struct UricAcidRecordSnapshot: Identifiable {
 
 struct RecordCard: View {
 	let record: UricAcidRecordSnapshot
+	let displayUnit: UricUnit
 	let userGender: UserGender
     let onTap: () -> Void
     let onDelete: () -> Void
@@ -187,42 +210,42 @@ struct RecordCard: View {
     
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 16) {
-                // 日期指示器
-                dateIndicator
-                
-                // 分隔线
-                Rectangle()
-                    .fill(Color.blue.opacity(0.2))
-                    .frame(width: 1, height: 50)
-                
-                // 数值信息
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(valueString)
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(valueColor)
-                        
-					Text(record.unit.displayName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    
+			VStack(alignment: .leading, spacing: 14) {
+				HStack(alignment: .firstTextBaseline, spacing: 12) {
+					HStack(spacing: 7) {
+						Text(record.measuredAt.chineseShortDate)
+							.font(.system(size: 17, weight: .semibold))
+							.foregroundStyle(.primary)
+							.lineLimit(1)
+						Image(systemName: "clock")
+							.font(.system(size: 16, weight: .medium))
+						Text(record.measuredAt.chineseTime)
+							.font(.system(size: 16, weight: .regular, design: .rounded))
+					}
+					.foregroundStyle(.secondary)
+
+					Spacer(minLength: 8)
+
+					HStack(alignment: .firstTextBaseline, spacing: 5) {
+						Text(valueString)
+							.font(.system(size: 31, weight: .bold, design: .rounded))
+							.foregroundStyle(valueColor)
+							.lineLimit(1)
+							.minimumScaleFactor(0.65)
+						Text(displayUnit.displayName)
+							.font(.system(size: 14, weight: .medium))
+							.foregroundStyle(.secondary)
+					}
+				}
+
 				if !record.note.isEmpty {
-                        Text(note)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
-                
-                Spacer()
-                
-                // 箭头指示
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-            }
+					Text(note)
+						.font(.system(size: 15))
+						.foregroundStyle(.secondary)
+						.lineLimit(2)
+						.frame(maxWidth: .infinity, alignment: .leading)
+				}
+			}
             .padding()
             .background(
                 RoundedRectangle(cornerRadius: 16)
@@ -256,24 +279,15 @@ struct RecordCard: View {
         }
     }
     
-    private var dateIndicator: some View {
-        VStack(spacing: 2) {
-            Text(record.measuredAt.chineseShortDate)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            
-            Text(record.measuredAt.chineseTime)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(.primary)
-        }
-        .frame(width: 60)
-    }
-
 	private var note: String { record.note }
     
-    private var valueString: String {
-        String(format: "%.0f", record.value)
-    }
+	private var valueString: String {
+		displayValue.formatted(.number.precision(.fractionLength(0...4)))
+	}
+
+	private var displayValue: Double {
+		UricUnit.convert(value: record.value, from: record.unit, to: displayUnit)
+	}
     
     private var valueColor: Color {
         let value = record.value

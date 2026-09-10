@@ -76,6 +76,10 @@
 "暂无数据" = "No Data";
 "添加记录后即可查看趋势图" = "Add a record to view your trend chart";
 "时间" = "Time";
+"日期" = "Date";
+"现在" = "Now";
+"今天" = "Today";
+"昨天" = "Yesterday";
 "尿酸" = "Uric Acid";
 "目标" = "Target";
 "统计数据" = "Statistics";

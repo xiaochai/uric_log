@@ -68,8 +68,15 @@ struct SettingsView: View {
 				let oldUnit = UricUnit(rawValue: lastPreferredUnitRawValue) ?? .umolL
 				let newUnit = UricUnit(rawValue: newValue) ?? .umolL
 				if oldUnit != newUnit {
-					targetValue = UricUnit.convert(value: targetValue, from: oldUnit, to: newUnit)
+					targetValue = roundedToFourPlaces(
+						UricUnit.convert(value: targetValue, from: oldUnit, to: newUnit)
+					)
 					lastPreferredUnitRawValue = newValue
+				}
+			}
+			.onChange(of: focusedField) { oldValue, newValue in
+				if oldValue == .targetValue, newValue != .targetValue {
+					targetValue = roundedToFourPlaces(targetValue)
 				}
 			}
 			.onChange(of: userGenderRawValue) { _, _ in
@@ -218,11 +225,15 @@ struct SettingsView: View {
 						Spacer()
 						
 						HStack(spacing: 4) {
-							TextField("", value: $targetValue, format: .number)
+							TextField(
+								"",
+								value: $targetValue,
+								format: .number.precision(.fractionLength(0...4))
+							)
 								.keyboardType(.decimalPad)
 							.focused($focusedField, equals: .targetValue)
 								.multilineTextAlignment(.trailing)
-								.frame(width: 60)
+								.frame(width: 90)
 							
 							Text(UricUnit(rawValue: preferredUnitRawValue)?.displayName ?? "μmol/L")
 								.font(.caption)
@@ -239,6 +250,10 @@ struct SettingsView: View {
 				.fill(Color(.secondarySystemGroupedBackground))
 		)
 		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+	}
+
+	private func roundedToFourPlaces(_ value: Double) -> Double {
+		(value * 10_000).rounded() / 10_000
 	}
 	
 	// MARK: - 导出卡片
@@ -405,6 +420,30 @@ struct SettingsView: View {
 				
 				Divider()
 					.padding(.leading, 44)
+
+				Link(destination: URL(string: "https://xiaochai.tech/uric_log/privacy-policy.html")!) {
+					HStack(spacing: 12) {
+						SettingIconView(icon: "hand.raised.fill", color: .teal)
+
+						Text("查看隐私政策")
+							.font(.system(size: 16))
+							.foregroundStyle(.primary)
+
+						Spacer()
+
+						Image(systemName: "arrow.up.right")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+				}
+				.buttonStyle(.plain)
+				.padding(.vertical, 12)
+				.simultaneousGesture(TapGesture().onEnded {
+					Analytics.track("privacy_policy_opened", properties: ["source": "settings"])
+				})
+
+				Divider()
+					.padding(.leading, 44)
 				
 				// 版本信息
 				HStack(spacing: 12) {
@@ -413,7 +452,7 @@ struct SettingsView: View {
 					VStack(alignment: .leading, spacing: 4) {
 						Text("版本")
 							.font(.system(size: 16))
-						Text("UricLog v1.0")
+						Text(appVersionText)
 							.font(.caption)
 							.foregroundStyle(.secondary)
 					}
@@ -437,6 +476,12 @@ struct SettingsView: View {
 				.fill(Color(.secondarySystemGroupedBackground))
 		)
 		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+	}
+
+	private var appVersionText: String {
+		let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "-"
+		let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "-"
+		return "UricLog v\(version) (\(build))"
 	}
 
 	private func exportCSV() {
