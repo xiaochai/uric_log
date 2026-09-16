@@ -5,6 +5,23 @@
 "正在加载数据..." = "Loading data...";
 "存储初始化提示" = "Storage Notice";
 "知道了" = "OK";
+"无法开启提醒" = "Unable to Enable Reminders";
+"前往系统设置" = "Open Settings";
+"请在系统设置中允许尿酸记录发送通知。" = "Allow Uric Acid Log to send notifications in Settings.";
+"测量提醒" = "Measurement Reminders";
+"定期提醒" = "Scheduled Reminders";
+"按选择的星期提醒测量尿酸" = "Get reminded to measure on selected days";
+"提醒日期" = "Reminder Days";
+"提醒时间" = "Reminder Time";
+"该测尿酸了" = "Time to Measure";
+"记录一次测量，持续关注尿酸变化。" = "Record a measurement and keep track of your uric acid trend.";
+"周一" = "Mon";
+"周二" = "Tue";
+"周三" = "Wed";
+"周四" = "Thu";
+"周五" = "Fri";
+"周六" = "Sat";
+"周日" = "Sun";
 
 "时间范围" = "Time Range";
 "范围" = "Range";

@@ -29,6 +29,7 @@
 		A1B2C3D4E5F6010203041102 /* AppOpenAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203041101 /* AppOpenAdManager.swift */; };
 		A1B2C3D4E5F6010203041302 /* PrivacyConsentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203041301 /* PrivacyConsentView.swift */; };
 		A1B2C3D4E5F6010203041402 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203041401 /* InfoPlist.strings */; };
+		A1B2C3D4E5F6010203041502 /* MeasurementReminderManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6010203041501 /* MeasurementReminderManager.swift */; };
 		FB2C1579ABD51122ABEE4306 /* libPods-UricLog.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1C6465FB09E23B4E7DB06276 /* libPods-UricLog.a */; };
 /* End PBXBuildFile section */
 
@@ -62,6 +63,7 @@
 		A1B2C3D4E5F6010203041301 /* PrivacyConsentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyConsentView.swift; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203041403 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A1B2C3D4E5F6010203041404 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		A1B2C3D4E5F6010203041501 /* MeasurementReminderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasurementReminderManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,6 +165,7 @@
 				A1B2C3D4E5F6010203040C01 /* Analytics.swift */,
 				A1B2C3D4E5F6010203041101 /* AppOpenAdManager.swift */,
 				A1B2C3D4E5F6010203040D01 /* Localization.swift */,
+				A1B2C3D4E5F6010203041501 /* MeasurementReminderManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -312,6 +315,7 @@
 				A1B2C3D4E5F6010203040A02 /* ICloudSettingsSync.swift in Sources */,
 				A1B2C3D4E5F6010203040C02 /* Analytics.swift in Sources */,
 				A1B2C3D4E5F6010203041102 /* AppOpenAdManager.swift in Sources */,
+				A1B2C3D4E5F6010203041502 /* MeasurementReminderManager.swift in Sources */,
 				A1B2C3D4E5F6010203040D02 /* Localization.swift in Sources */,
 				A1B2C3D4E5F6010203040F02 /* DailySplashView.swift in Sources */,
 				A1B2C3D4E5F6010203041302 /* PrivacyConsentView.swift in Sources */,
@@ -378,7 +382,7 @@
 				CODE_SIGN_ENTITLEMENTS = UricLog/UricLog.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N49M3Z72D3;
 				ENABLE_PREVIEWS = YES;
@@ -446,7 +450,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = UricLog/UricLog.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 6;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N49M3Z72D3;
 				ENABLE_PREVIEWS = YES;

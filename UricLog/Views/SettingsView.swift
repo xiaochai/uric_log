@@ -15,6 +15,10 @@ struct SettingsView: View {
 	@AppStorage(AppSettingsKey.targetValue) private var targetValue: Double = 420
 	@AppStorage(AppSettingsKey.iCloudEnabled) private var iCloudEnabled = false
 	@AppStorage(AppSettingsKey.appLanguage) private var appLanguageRawValue = AppLanguage.simplifiedChinese.rawValue
+	@AppStorage(AppSettingsKey.measurementReminderEnabled) private var reminderEnabled = false
+	@AppStorage(AppSettingsKey.measurementReminderWeekdays) private var reminderWeekdaysRawValue = "2,4,6"
+	@AppStorage(AppSettingsKey.measurementReminderHour) private var reminderHour = 9
+	@AppStorage(AppSettingsKey.measurementReminderMinute) private var reminderMinute = 0
 
 	@State private var exportRange: TimeRange = .days90
 	@State private var exportURL: URL?
@@ -23,6 +27,7 @@ struct SettingsView: View {
 	@State private var showingHiddenSettings = false
 	@State private var versionTapCount = 0
 	@State private var lastPreferredUnitRawValue: String = UricUnit.umolL.rawValue
+	@State private var showingNotificationPermissionAlert = false
 
 	init() {}
 
@@ -35,6 +40,8 @@ struct SettingsView: View {
 			VStack(spacing: 20) {
 				// 偏好设置
 				preferencesCard
+
+				reminderCard
 				
 				// 导出设置
 				exportCard
@@ -53,12 +60,22 @@ struct SettingsView: View {
 		.sheet(isPresented: $showingHiddenSettings) {
 			HiddenSettingsView()
 		}
-			.alert("需要重启", isPresented: $showingRestartHint) {
+		.alert("需要重启", isPresented: $showingRestartHint) {
 				Button("知道了") {
 					Analytics.track("icloud_restart_hint_acknowledged")
 				}
 		} message: {
 			Text("iCloud 同步开关切换后，建议杀掉 App 重启一次。")
+		}
+		.alert("无法开启提醒", isPresented: $showingNotificationPermissionAlert) {
+			Button("知道了", role: .cancel) {}
+			Button("前往系统设置") {
+				if let url = URL(string: UIApplication.openSettingsURLString) {
+					UIApplication.shared.open(url)
+				}
+			}
+		} message: {
+			Text("请在系统设置中允许尿酸记录发送通知。")
 		}
 		.onAppear {
 			lastPreferredUnitRawValue = preferredUnitRawValue
@@ -128,6 +145,7 @@ struct SettingsView: View {
 				.onChange(of: appLanguageRawValue) { _, newValue in
 					Analytics.track("app_language_changed", properties: ["language": newValue])
 					persistence.refreshLocalizedStatus()
+					rescheduleReminder()
 				}
 
 				Divider()
@@ -254,6 +272,157 @@ struct SettingsView: View {
 
 	private func roundedToFourPlaces(_ value: Double) -> Double {
 		(value * 10_000).rounded() / 10_000
+	}
+
+	private var reminderCard: some View {
+		VStack(alignment: .leading, spacing: 16) {
+			HStack {
+				Image(systemName: "bell.badge.fill")
+					.font(.title3)
+					.foregroundStyle(.orange)
+				Text("测量提醒")
+					.font(.system(size: 17, weight: .semibold))
+				Spacer()
+			}
+
+			VStack(spacing: 0) {
+				HStack(spacing: 12) {
+					SettingIconView(icon: "bell.fill", color: .orange)
+					VStack(alignment: .leading, spacing: 4) {
+						Text("定期提醒")
+							.font(.system(size: 16))
+						Text("按选择的星期提醒测量尿酸")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+					Spacer()
+					Toggle("", isOn: $reminderEnabled)
+						.labelsHidden()
+						.onChange(of: reminderEnabled) { _, enabled in
+							updateReminder(enabled: enabled)
+						}
+				}
+				.padding(.vertical, 12)
+
+				if reminderEnabled {
+					Divider().padding(.leading, 44)
+
+					VStack(alignment: .leading, spacing: 12) {
+						Text("提醒日期")
+							.font(.subheadline)
+							.foregroundStyle(.secondary)
+						HStack(spacing: 8) {
+							ForEach(reminderDayOptions, id: \.weekday) { option in
+								Button {
+									toggleReminderDay(option.weekday)
+								} label: {
+									Text(option.title)
+										.font(.subheadline.weight(.medium))
+										.frame(maxWidth: .infinity, minHeight: 36)
+										.background(selectedReminderWeekdays.contains(option.weekday) ? Color.blue : Color(.tertiarySystemFill))
+										.foregroundStyle(selectedReminderWeekdays.contains(option.weekday) ? .white : .primary)
+										.clipShape(RoundedRectangle(cornerRadius: 8))
+								}
+								.buttonStyle(.plain)
+							}
+						}
+					}
+					.padding(.vertical, 12)
+
+					Divider().padding(.leading, 44)
+
+					HStack(spacing: 12) {
+						SettingIconView(icon: "clock.fill", color: .blue)
+						Text("提醒时间")
+							.font(.system(size: 16))
+						Spacer()
+						DatePicker("", selection: reminderTime, displayedComponents: .hourAndMinute)
+							.labelsHidden()
+							.onChange(of: reminderHour) { _, _ in rescheduleReminder() }
+							.onChange(of: reminderMinute) { _, _ in rescheduleReminder() }
+					}
+					.padding(.vertical, 12)
+				}
+			}
+		}
+		.padding()
+		.background(
+			RoundedRectangle(cornerRadius: 16)
+				.fill(Color(.secondarySystemGroupedBackground))
+		)
+		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+	}
+
+	private var reminderDayOptions: [(weekday: Int, title: String)] {
+		[(2, "周一"), (3, "周二"), (4, "周三"), (5, "周四"), (6, "周五"), (7, "周六"), (1, "周日")]
+			.map { ($0.0, L10n.string($0.1)) }
+	}
+
+	private var selectedReminderWeekdays: Set<Int> {
+		Set(reminderWeekdaysRawValue.split(separator: ",").compactMap { Int($0) })
+	}
+
+	private var reminderTime: Binding<Date> {
+		Binding(
+			get: {
+				Calendar.current.date(from: DateComponents(hour: reminderHour, minute: reminderMinute)) ?? Date()
+			},
+			set: { date in
+				let components = Calendar.current.dateComponents([.hour, .minute], from: date)
+				reminderHour = components.hour ?? 9
+				reminderMinute = components.minute ?? 0
+			}
+		)
+	}
+
+	private func toggleReminderDay(_ weekday: Int) {
+		var weekdays = selectedReminderWeekdays
+		if weekdays.contains(weekday) {
+			guard weekdays.count > 1 else { return }
+			weekdays.remove(weekday)
+		} else {
+			weekdays.insert(weekday)
+		}
+		reminderWeekdaysRawValue = weekdays.sorted().map(String.init).joined(separator: ",")
+		rescheduleReminder()
+	}
+
+	private func updateReminder(enabled: Bool) {
+		Task {
+			if enabled {
+				guard await MeasurementReminderManager.requestAuthorization() else {
+					reminderEnabled = false
+					showingNotificationPermissionAlert = true
+					Analytics.track("measurement_reminder_permission_denied")
+					return
+				}
+				await MeasurementReminderManager.schedule(
+					weekdays: selectedReminderWeekdays,
+					hour: reminderHour,
+					minute: reminderMinute
+				)
+				Analytics.track("measurement_reminder_enabled")
+			} else {
+				await MeasurementReminderManager.cancel()
+				Analytics.track("measurement_reminder_disabled")
+			}
+		}
+	}
+
+	private func rescheduleReminder() {
+		guard reminderEnabled else { return }
+		Task {
+			await MeasurementReminderManager.schedule(
+				weekdays: selectedReminderWeekdays,
+				hour: reminderHour,
+				minute: reminderMinute
+			)
+			Analytics.track("measurement_reminder_schedule_changed", properties: [
+				"weekdays": reminderWeekdaysRawValue,
+				"hour": reminderHour,
+				"minute": reminderMinute,
+			])
+		}
 	}
 	
 	// MARK: - 导出卡片

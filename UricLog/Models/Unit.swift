@@ -81,6 +81,10 @@ enum AppSettingsKey {
 	static let adProviderOverride = "adProviderOverride"
 	static let admobConsentTestMode = "admobConsentTestMode"
 	static let cachedStorefrontCountryCode = "cachedStorefrontCountryCode"
+	static let measurementReminderEnabled = "measurementReminderEnabled"
+	static let measurementReminderWeekdays = "measurementReminderWeekdays"
+	static let measurementReminderHour = "measurementReminderHour"
+	static let measurementReminderMinute = "measurementReminderMinute"
 
 	static let legacyKeys = [
 		preferredUnit,
