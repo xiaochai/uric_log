@@ -4,6 +4,7 @@ struct PrivacyConsentContainer<Content: View>: View {
 	@AppStorage(AppSettingsKey.privacyConsentGranted) private var hasConsent = false
 	@AppStorage(AppSettingsKey.privacyConsentChoiceMade) private var hasMadeChoice = false
 	@State private var countryCode: String?
+	@State private var hasTrackedConsentScreen = false
 	private let content: Content
 
 	init(@ViewBuilder content: () -> Content) {
@@ -21,15 +22,22 @@ struct PrivacyConsentContainer<Content: View>: View {
 			} else {
 				PrivacyConsentView(
 					accept: {
+						Analytics.track("privacy_consent_accepted")
 						hasConsent = true
 						hasMadeChoice = true
 						AppOpenAdManager.shared.startIfAllowed(countryCode: countryCode)
 					},
 					decline: {
+						Analytics.track("privacy_consent_declined")
 						hasConsent = false
 						hasMadeChoice = true
 					}
 				)
+				.onAppear {
+					guard !hasTrackedConsentScreen else { return }
+					hasTrackedConsentScreen = true
+					Analytics.track("privacy_consent_shown")
+				}
 			}
 		}
 		.task {

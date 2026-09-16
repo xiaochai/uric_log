@@ -136,9 +136,13 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 	}
 
 	private func resolveProvider(countryCode: String?) -> AdProvider {
+		#if DEBUG
 		let preference = AdProviderPreference(
 			rawValue: UserDefaults.standard.string(forKey: AppSettingsKey.adProviderOverride) ?? ""
 		) ?? .automatic
+		#else
+		let preference = AdProviderPreference.automatic
+		#endif
 		let resolvedProvider: AdProvider
 		switch preference {
 		case .admob:

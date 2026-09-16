@@ -631,11 +631,13 @@ struct SettingsView: View {
 				.padding(.vertical, 12)
 				.contentShape(Rectangle())
 				.onTapGesture {
+					#if DEBUG
 					versionTapCount += 1
 					if versionTapCount >= 5 {
 						versionTapCount = 0
 						showingHiddenSettings = true
 					}
+					#endif
 				}
 			}
 		}
