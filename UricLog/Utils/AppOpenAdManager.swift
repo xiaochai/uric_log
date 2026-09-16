@@ -31,13 +31,18 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 	private var isPresenting = false
 	private var shouldPresentWhenLoaded = false
 	private var hasRequestedAdMobConsent = false
+	private var isAdMobReady = false
 
 	private override init() {
 		super.init()
 	}
 
-	func startIfAllowed() {
-		let resolvedProvider = resolveProvider()
+	func startIfAllowed(countryCode: String?) {
+		let resolvedProvider = resolveProvider(countryCode: countryCode)
+		Analytics.track("app_open_ad_provider_resolved", properties: [
+			"provider": resolvedProvider.rawValue,
+			"storefront_country": countryCode ?? "unknown",
+		])
 		guard isAdvertisingAllowed(for: resolvedProvider) else {
 			Analytics.track("app_open_ad_skipped", properties: [
 				"provider": resolvedProvider.rawValue,
@@ -67,6 +72,7 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 		}
 
 		guard resolvedProvider != .admob, !hasDisplayedToday else { return }
+		shouldPresentWhenLoaded = true
 		load()
 	}
 
@@ -103,10 +109,10 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 	func attemptForegroundPresentation() {
 		guard let provider,
 			isAdvertisingAllowed(for: provider),
+			provider != .admob || isAdMobReady,
 			!hasDisplayedToday,
 			!isPresenting else { return }
 
-		startIfAllowed()
 		if presentIfAvailable() { return }
 		shouldPresentWhenLoaded = true
 		load()
@@ -129,18 +135,23 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 		resetDailyExposure()
 	}
 
-	private func resolveProvider() -> AdProvider {
+	private func resolveProvider(countryCode: String?) -> AdProvider {
 		let preference = AdProviderPreference(
 			rawValue: UserDefaults.standard.string(forKey: AppSettingsKey.adProviderOverride) ?? ""
 		) ?? .automatic
+		let resolvedProvider: AdProvider
 		switch preference {
-		case .admob: return .admob
-		case .umeng: return .umeng
+		case .admob:
+			resolvedProvider = .admob
+		case .umeng:
+			resolvedProvider = .umeng
 		case .automatic:
-			let countryCode = AppStoreRegion.countryCode
-			Self.logger.info("App Store storefront: \(countryCode ?? "unknown", privacy: .public)")
-			return countryCode == "CHN" ? .umeng : .admob
+			resolvedProvider = AppStoreRegion.isMainlandChina(countryCode) ? .umeng : .admob
 		}
+		Self.logger.info(
+			"Ad provider resolved: preference=\(preference.rawValue, privacy: .public) routing_country=\(countryCode ?? "unknown", privacy: .public) locale=\(AppStoreRegion.localeCountryCode ?? "unknown", privacy: .public) cached_storefront=\(AppStoreRegion.cachedStorefrontCountryCode ?? "unknown", privacy: .public) provider=\(resolvedProvider.rawValue, privacy: .public)"
+		)
+		return resolvedProvider
 	}
 
 	private func isAdvertisingAllowed(for provider: AdProvider) -> Bool {
@@ -231,6 +242,7 @@ final class AppOpenAdManager: NSObject, @preconcurrency UMUnionSplashAdDelegate,
 						}
 						Analytics.track("app_open_ad_consent_completed", properties: ["provider": "admob"])
 						MobileAds.shared.start(completionHandler: nil)
+						self.isAdMobReady = true
 						self.isLoading = false
 						if !self.hasDisplayedToday { self.load() }
 					}

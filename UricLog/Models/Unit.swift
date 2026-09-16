@@ -2,12 +2,40 @@ import Foundation
 import StoreKit
 
 enum AppStoreRegion {
-	static var countryCode: String? {
-		SKPaymentQueue.default().storefront?.countryCode
+	static var localeCountryCode: String? {
+		Locale.current.region?.identifier
 	}
 
-	static var isMainlandChina: Bool {
-		countryCode == "CHN"
+	static var cachedStorefrontCountryCode: String? {
+		UserDefaults.standard.string(forKey: AppSettingsKey.cachedStorefrontCountryCode)
+	}
+
+	static var launchCountryCode: String? {
+		if isMainlandChina(localeCountryCode) {
+			return localeCountryCode
+		}
+		return cachedStorefrontCountryCode ?? localeCountryCode
+	}
+
+	static func resolveCountryCode() async -> String? {
+		for attempt in 0..<4 {
+			if let countryCode = await Storefront.current?.countryCode {
+				return countryCode
+			}
+			if attempt < 3 {
+				try? await Task.sleep(for: .milliseconds(250 * (attempt + 1)))
+			}
+		}
+		return nil
+	}
+
+	static func refreshStorefrontCountryCode() async {
+		guard let countryCode = await resolveCountryCode() else { return }
+		UserDefaults.standard.set(countryCode, forKey: AppSettingsKey.cachedStorefrontCountryCode)
+	}
+
+	static func isMainlandChina(_ countryCode: String?) -> Bool {
+		countryCode == "CHN" || countryCode == "CN"
 	}
 }
 
@@ -52,6 +80,7 @@ enum AppSettingsKey {
 	static let lastAppOpenAdExposureDate = "lastAppOpenAdExposureDate"
 	static let adProviderOverride = "adProviderOverride"
 	static let admobConsentTestMode = "admobConsentTestMode"
+	static let cachedStorefrontCountryCode = "cachedStorefrontCountryCode"
 
 	static let legacyKeys = [
 		preferredUnit,

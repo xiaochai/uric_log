@@ -12,7 +12,6 @@ struct UricLogApp: App {
 	init() {
 		AppLanguage.initializeIfNeeded()
 		Analytics.start()
-		AppOpenAdManager.shared.startIfAllowed()
 
 		let iCloudEnabled = UserDefaults.standard.bool(forKey: AppSettingsKey.iCloudEnabled)
 		_persistenceController = StateObject(wrappedValue: PersistenceController(iCloudEnabled: iCloudEnabled))

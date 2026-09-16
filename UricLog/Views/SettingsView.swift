@@ -587,14 +587,17 @@ private struct HiddenSettingsView: View {
 				}
 			}
 			.confirmationDialog(
-				"确认重置今日广告展示记录？",
+				"确认重置今日广告展示记录和地区缓存？",
 				isPresented: $showingAdResetConfirmation,
 				titleVisibility: .visible
 			) {
 				Button("重置广告展示", role: .destructive) {
 					AppOpenAdManager.shared.resetDailyExposure()
+					UserDefaults.standard.removeObject(forKey: AppSettingsKey.cachedStorefrontCountryCode)
 					dismiss()
 				}
+			} message: {
+				Text("下次启动将使用系统地区，并在后台重新获取 App Store 地区。")
 			}
 		}
 	}

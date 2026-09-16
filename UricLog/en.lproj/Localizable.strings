@@ -166,4 +166,6 @@
 "重置后请彻底关闭并重新打开 App。尿酸记录和设置不会被删除。" = "After resetting, fully close and reopen the app. Your uric acid records and settings will not be deleted.";
 "确认重置隐私授权？" = "Reset privacy consent?";
 "确认重置今日广告展示记录？" = "Reset today's ad display record?";
+"确认重置今日广告展示记录和地区缓存？" = "Reset today's ad display record and region cache?";
+"下次启动将使用系统地区，并在后台重新获取 App Store 地区。" = "On the next launch, the app will use the system region and refresh the App Store region in the background.";
 "完成" = "Done";

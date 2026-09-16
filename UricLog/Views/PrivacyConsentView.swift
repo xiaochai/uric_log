@@ -3,22 +3,27 @@ import SwiftUI
 struct PrivacyConsentContainer<Content: View>: View {
 	@AppStorage(AppSettingsKey.privacyConsentGranted) private var hasConsent = false
 	@AppStorage(AppSettingsKey.privacyConsentChoiceMade) private var hasMadeChoice = false
+	@State private var countryCode: String?
 	private let content: Content
 
 	init(@ViewBuilder content: () -> Content) {
 		self.content = content()
+		_countryCode = State(initialValue: AppStoreRegion.launchCountryCode)
 	}
 
 	var body: some View {
 		Group {
-			if !AppStoreRegion.isMainlandChina || hasMadeChoice {
+			if !AppStoreRegion.isMainlandChina(countryCode) || hasMadeChoice {
 				content
+					.onAppear {
+						AppOpenAdManager.shared.startIfAllowed(countryCode: countryCode)
+					}
 			} else {
 				PrivacyConsentView(
 					accept: {
 						hasConsent = true
 						hasMadeChoice = true
-						AppOpenAdManager.shared.startIfAllowed()
+						AppOpenAdManager.shared.startIfAllowed(countryCode: countryCode)
 					},
 					decline: {
 						hasConsent = false
@@ -26,6 +31,9 @@ struct PrivacyConsentContainer<Content: View>: View {
 					}
 				)
 			}
+		}
+		.task {
+			await AppStoreRegion.refreshStorefrontCountryCode()
 		}
 	}
 }
