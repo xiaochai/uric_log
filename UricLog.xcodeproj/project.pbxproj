@@ -85,7 +85,6 @@
 				4BF7AFE14D05216A79CFFC5E /* Pods-UricLog.debug.xcconfig */,
 				297F84342601D8D366355D0A /* Pods-UricLog.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -284,9 +283,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-UricLog/Pods-UricLog-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-UricLog/Pods-UricLog-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -325,15 +328,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		A1B2C3D4E5F6010203041401 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				A1B2C3D4E5F6010203041403 /* en */,
-				A1B2C3D4E5F6010203041404 /* zh-Hans */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
 		A1B2C3D4E5F6010203040E01 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -341,6 +335,15 @@
 				A1B2C3D4E5F6010203040E04 /* zh-Hans */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		A1B2C3D4E5F6010203041401 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A1B2C3D4E5F6010203041403 /* en */,
+				A1B2C3D4E5F6010203041404 /* zh-Hans */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -382,7 +385,7 @@
 				CODE_SIGN_ENTITLEMENTS = UricLog/UricLog.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N49M3Z72D3;
 				ENABLE_PREVIEWS = YES;
@@ -450,7 +453,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = UricLog/UricLog.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N49M3Z72D3;
 				ENABLE_PREVIEWS = YES;
