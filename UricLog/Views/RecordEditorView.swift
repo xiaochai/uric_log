@@ -14,6 +14,7 @@ struct RecordEditorView: View {
     @State private var valueText: String = ""
     @State private var selectedUnit: UricUnit = .umolL
     @State private var measuredAt: Date = Date()
+    @State private var draftMeasuredAt: Date = Date()
     @State private var note: String = ""
     @State private var showingExtremeConfirm = false
     @State private var showingReferenceInfo = false
@@ -85,7 +86,7 @@ struct RecordEditorView: View {
         }
 		.sheet(isPresented: $showingDatePicker) {
 			measurementTimePicker
-				.presentationDetents([.large])
+				.presentationDetents([.medium])
 				.presentationDragIndicator(.visible)
 		}
         .onAppear {
@@ -274,6 +275,7 @@ struct RecordEditorView: View {
             
 			Button {
 				focusedField = nil
+				draftMeasuredAt = measuredAt
 				showingDatePicker = true
 			} label: {
 				HStack(spacing: 12) {
@@ -337,55 +339,48 @@ struct RecordEditorView: View {
 
 	private var measurementTimePicker: some View {
 		NavigationStack {
-			ScrollView {
-				VStack(spacing: 16) {
-				Text(measuredAt.chineseDateTime)
-					.font(.system(size: 17, weight: .semibold))
-					.foregroundStyle(.primary)
-					.padding(.top, 4)
+			VStack(spacing: 18) {
+				Text(draftMeasuredAt.chineseDateTime)
+					.font(.system(size: 19, weight: .semibold))
+					.frame(maxWidth: .infinity)
+					.padding(.top, 8)
 
-				HStack(spacing: 12) {
+				HStack(spacing: 10) {
 					quickDateButton("今天", dayOffset: 0)
 					quickDateButton("昨天", dayOffset: -1)
+					Button("现在") { draftMeasuredAt = Date() }
+						.font(.subheadline.weight(.semibold))
+						.frame(maxWidth: .infinity)
+						.padding(.vertical, 10)
+						.background(Color.blue.opacity(0.1))
+						.clipShape(RoundedRectangle(cornerRadius: 8))
+						.buttonStyle(.plain)
 				}
 
-				DatePicker(
-					"日期",
-					selection: $measuredAt,
-					displayedComponents: .date
-				)
-				.datePickerStyle(.graphical)
-				.labelsHidden()
-				.frame(maxWidth: .infinity)
-
-				HStack {
-					Text("时间")
-						.font(.headline)
-					Spacer()
+				VStack(spacing: 0) {
+					datePickerRow(title: "日期", components: .date)
+					Divider().padding(.leading, 16)
+					datePickerRow(title: "时间", components: .hourAndMinute)
 				}
+				.background(Color(.secondarySystemGroupedBackground))
+				.clipShape(RoundedRectangle(cornerRadius: 12))
 
-				DatePicker(
-					"时间",
-					selection: $measuredAt,
-					displayedComponents: .hourAndMinute
-				)
-				.datePickerStyle(.wheel)
-				.labelsHidden()
-				.frame(height: 150)
-				.clipped()
-				}
-				.padding(.horizontal)
+				Label("录入久远记录时，点开日期后轻点日历顶部的年月，即可快速切换年份", systemImage: "calendar.badge.clock")
+					.font(.caption)
+					.foregroundStyle(.secondary)
+					.frame(maxWidth: .infinity, alignment: .leading)
+				Spacer(minLength: 0)
 			}
-			.navigationTitle("测量时间")
+			.padding(.horizontal)
+			.navigationTitle("选择测量时间")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
-					Button("现在") {
-						measuredAt = Date()
-					}
+					Button("取消") { showingDatePicker = false }
 				}
 				ToolbarItem(placement: .confirmationAction) {
 					Button("完成") {
+						measuredAt = draftMeasuredAt
 						showingDatePicker = false
 					}
 				}
@@ -393,12 +388,25 @@ struct RecordEditorView: View {
 		}
 	}
 
+	private func datePickerRow(title: LocalizedStringKey, components: DatePickerComponents) -> some View {
+		HStack {
+			Text(title)
+				.font(.body.weight(.medium))
+			Spacer()
+			DatePicker("", selection: $draftMeasuredAt, displayedComponents: components)
+				.datePickerStyle(.compact)
+				.labelsHidden()
+		}
+		.padding(.horizontal, 16)
+		.frame(minHeight: 54)
+	}
+
 	private func quickDateButton(_ title: LocalizedStringKey, dayOffset: Int) -> some View {
 		Button {
 			let calendar = Calendar.current
 			guard let targetDay = calendar.date(byAdding: .day, value: dayOffset, to: Date()) else { return }
 			let day = calendar.dateComponents([.year, .month, .day], from: targetDay)
-			let time = calendar.dateComponents([.hour, .minute], from: measuredAt)
+			let time = calendar.dateComponents([.hour, .minute], from: draftMeasuredAt)
 			var components = DateComponents()
 			components.year = day.year
 			components.month = day.month
@@ -406,7 +414,7 @@ struct RecordEditorView: View {
 			components.hour = time.hour
 			components.minute = time.minute
 			if let date = calendar.date(from: components) {
-				measuredAt = date
+				draftMeasuredAt = date
 			}
 		} label: {
 			Text(title)

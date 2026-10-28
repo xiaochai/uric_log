@@ -28,6 +28,13 @@ enum DateFormatters {
 		formatter.setLocalizedDateFormatFromTemplate("MMMdEEE")
 		return formatter
 	}
+
+	static func year(locale: Locale) -> DateFormatter {
+		let formatter = DateFormatter()
+		formatter.locale = locale
+		formatter.setLocalizedDateFormatFromTemplate("y")
+		return formatter
+	}
     
     static func time(locale: Locale) -> DateFormatter {
         let formatter = DateFormatter()
@@ -52,6 +59,10 @@ extension Date {
 
 	var localizedMonthDayWeekday: String {
 		DateFormatters.monthDayWeekday(locale: AppLanguage.selected.locale).string(from: self)
+	}
+
+	var localizedYear: String {
+		DateFormatters.year(locale: AppLanguage.selected.locale).string(from: self)
 	}
     
     var chineseTime: String {

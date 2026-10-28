@@ -101,12 +101,19 @@ struct RecordsListView: View {
             if filteredRecords.isEmpty {
                 emptyStateView
             } else {
-                LazyVStack(spacing: 12) {
-					ForEach(filteredRecords.map(UricAcidRecordSnapshot.init(record:)), id: \.id) { snapshot in
-						RecordCard(record: snapshot, displayUnit: preferredUnit, userGender: userGender) {
-							edit(objectID: snapshot.id)
-						} onDelete: {
-							delete(objectID: snapshot.id)
+                LazyVStack(alignment: .leading, spacing: 0) {
+					ForEach(Array(recordYearSections.enumerated()), id: \.element.id) { index, section in
+						yearHeader(section.representativeDate)
+							.padding(.top, index == 0 ? 0 : 12)
+							.padding(.bottom, 10)
+
+						ForEach(section.records) { snapshot in
+							RecordCard(record: snapshot, displayUnit: preferredUnit, userGender: userGender) {
+								edit(objectID: snapshot.id)
+							} onDelete: {
+								delete(objectID: snapshot.id)
+							}
+							.padding(.bottom, 12)
 						}
 					}
                 }
@@ -161,6 +168,32 @@ struct RecordsListView: View {
         return records.filter { $0.measuredAt >= start }
     }
 
+	private var recordYearSections: [RecordYearSection] {
+		let calendar = Calendar.current
+		return filteredRecords
+			.map(UricAcidRecordSnapshot.init(record:))
+			.reduce(into: []) { sections, record in
+				let year = calendar.component(.year, from: record.measuredAt)
+				if sections.last?.year == year {
+					sections[sections.count - 1].records.append(record)
+				} else {
+					sections.append(RecordYearSection(year: year, records: [record]))
+				}
+			}
+	}
+
+	private func yearHeader(_ date: Date) -> some View {
+		HStack(spacing: 10) {
+			Text(date.localizedYear)
+				.font(.subheadline.weight(.semibold))
+				.foregroundStyle(.secondary)
+			Rectangle()
+				.fill(Color.secondary.opacity(0.18))
+				.frame(height: 1)
+		}
+		.padding(.horizontal, 4)
+	}
+
 	private func edit(objectID: NSManagedObjectID) {
 		if let record = try? viewContext.existingObject(with: objectID) as? UricAcidRecordEntity {
 			Analytics.track("record_opened")
@@ -180,6 +213,13 @@ struct RecordsListView: View {
 private struct RecordEditorDestination: Identifiable {
 	let id = UUID()
 	let record: UricAcidRecordEntity?
+}
+
+private struct RecordYearSection: Identifiable {
+	let year: Int
+	var records: [UricAcidRecordSnapshot]
+	var id: Int { year }
+	var representativeDate: Date { records[0].measuredAt }
 }
 
 // MARK: - Record Card

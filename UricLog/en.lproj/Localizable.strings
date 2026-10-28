@@ -94,6 +94,9 @@
 "添加记录后即可查看趋势图" = "Add a record to view your trend chart";
 "时间" = "Time";
 "日期" = "Date";
+"选择测量时间" = "Select Measurement Time";
+"录入久远记录时，点开日期后轻点日历顶部的年月，即可快速切换年份" = "For older records, open the date picker and tap the month and year at the top to jump to another year.";
+"纵轴单位：%@" = "Y-axis unit: %@";
 "现在" = "Now";
 "今天" = "Today";
 "昨天" = "Yesterday";

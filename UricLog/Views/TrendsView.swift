@@ -144,23 +144,13 @@ struct TrendsView: View {
 	}
 	
 	private var chartView: some View {
-		Chart {
-			// 渐变区域
-			ForEach(filteredPoints, id: \.recordID) { point in
-				AreaMark(
-						x: .value(L10n.string("时间"), point.measuredAt),
-						y: .value(L10n.string("尿酸"), point.value)
-				)
-				.interpolationMethod(.catmullRom)
-				.foregroundStyle(
-					LinearGradient(
-						colors: [Color.blue.opacity(0.3), Color.blue.opacity(0.05)],
-						startPoint: .top,
-						endPoint: .bottom
-					)
-				)
-			}
-			
+		VStack(alignment: .trailing, spacing: 4) {
+			Text(preferredUnit.displayName)
+				.font(.caption2.weight(.medium))
+				.foregroundStyle(.secondary)
+				.accessibilityLabel(L10n.format("纵轴单位：%@", preferredUnit.displayName))
+
+			Chart {
 			// 线条
 			ForEach(filteredPoints, id: \.recordID) { point in
 				LineMark(
@@ -206,40 +196,50 @@ struct TrendsView: View {
 						)
 					)
 			}
-		}
-		.chartYScale(domain: yDomain)
-		.chartPlotStyle { plotArea in
-			plotArea
-				.clipShape(RoundedRectangle(cornerRadius: 8))
-		}
-		.chartXAxis {
-			AxisMarks(values: .automatic(desiredCount: 4)) { value in
-				AxisGridLine()
-					.foregroundStyle(.secondary.opacity(0.2))
-				AxisValueLabel {
-					if let date = value.as(Date.self) {
-						Text(date.chineseShortDate)
-							.font(.caption)
-							.foregroundStyle(.secondary)
+			}
+			.chartYScale(domain: yDomain)
+			.chartPlotStyle { plotArea in
+				plotArea
+					.clipShape(RoundedRectangle(cornerRadius: 8))
+			}
+			.chartXAxis {
+				AxisMarks(values: .automatic(desiredCount: 4)) { value in
+					AxisGridLine()
+						.foregroundStyle(.secondary.opacity(0.2))
+					AxisValueLabel {
+						if let date = value.as(Date.self) {
+							Text(date.chineseShortDate)
+								.font(.caption)
+								.foregroundStyle(.secondary)
+						}
 					}
 				}
 			}
-		}
-		.chartYAxis {
-			AxisMarks { value in
-				AxisGridLine()
-					.foregroundStyle(.secondary.opacity(0.2))
-				AxisValueLabel {
-					if let val = value.as(Double.self) {
-						Text("\(Int(val))")
-							.font(.caption)
-							.foregroundStyle(.secondary)
+			.chartYAxis {
+				AxisMarks { value in
+					AxisGridLine()
+						.foregroundStyle(.secondary.opacity(0.2))
+					AxisValueLabel {
+						if let val = value.as(Double.self) {
+							Text(axisValue(val))
+								.font(.caption)
+								.foregroundStyle(.secondary)
+						}
 					}
 				}
 			}
+			.frame(height: 260)
 		}
-		.frame(height: 260)
 		.padding(.vertical, 8)
+	}
+
+	private func axisValue(_ value: Double) -> String {
+		switch preferredUnit {
+		case .umolL:
+			return value.formatted(.number.precision(.fractionLength(0)))
+		case .mgdL:
+			return value.formatted(.number.precision(.fractionLength(1)))
+		}
 	}
 	
 	// MARK: - 统计卡片
