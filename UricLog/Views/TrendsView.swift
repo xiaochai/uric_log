@@ -151,21 +151,23 @@ struct TrendsView: View {
 				.accessibilityLabel(L10n.format("纵轴单位：%@", preferredUnit.displayName))
 
 			Chart {
-			// 线条
-			ForEach(filteredPoints, id: \.recordID) { point in
-				LineMark(
-					x: .value(L10n.string("时间"), point.measuredAt),
-					y: .value(L10n.string("尿酸"), point.value)
-				)
-				.interpolationMethod(.catmullRom)
-				.foregroundStyle(
-					LinearGradient(
-						colors: [.blue, .cyan],
-						startPoint: .leading,
-						endPoint: .trailing
+			// 单条记录只显示数据点；多条记录使用不过冲的平滑曲线连接。
+			if filteredPoints.count > 1 {
+				ForEach(filteredPoints, id: \.recordID) { point in
+					LineMark(
+						x: .value(L10n.string("时间"), point.measuredAt),
+						y: .value(L10n.string("尿酸"), point.value)
 					)
-				)
-				.lineStyle(StrokeStyle(lineWidth: 3))
+					.interpolationMethod(lineInterpolation)
+					.foregroundStyle(
+						LinearGradient(
+							colors: [.blue, .cyan],
+							startPoint: .leading,
+							endPoint: .trailing
+						)
+					)
+					.lineStyle(StrokeStyle(lineWidth: 3))
+				}
 			}
 
 			// 数据点
@@ -197,20 +199,33 @@ struct TrendsView: View {
 					)
 			}
 			}
+			.chartXScale(
+				range: .plotDimension(startPadding: 34, endPadding: 34)
+			)
 			.chartYScale(domain: yDomain)
 			.chartPlotStyle { plotArea in
 				plotArea
 					.clipShape(RoundedRectangle(cornerRadius: 8))
 			}
 			.chartXAxis {
-				AxisMarks(values: .automatic(desiredCount: 4)) { value in
+				AxisMarks(values: xAxisDates) { value in
 					AxisGridLine()
 						.foregroundStyle(.secondary.opacity(0.2))
 					AxisValueLabel {
 						if let date = value.as(Date.self) {
-							Text(date.chineseShortDate)
-								.font(.caption)
-								.foregroundStyle(.secondary)
+							if spansMultipleYears {
+								VStack(spacing: 1) {
+									Text(date.chineseShortDate)
+										.font(.caption2)
+									Text(date.localizedYear)
+										.font(.caption2.weight(.medium))
+										.foregroundStyle(.tertiary)
+								}
+								.multilineTextAlignment(.center)
+							} else {
+								Text(date.chineseShortDate)
+									.font(.caption)
+							}
 						}
 					}
 				}
@@ -358,6 +373,74 @@ struct TrendsView: View {
 		let lower = max(0, minValue - padding)
 		let upper = maxValue + padding
 		return lower...upper
+	}
+
+	/// 横轴刻度吸附到真实记录日期。跨年时减少为 3 个，避免标签拥挤。
+	private var xAxisDates: [Date] {
+		let dates = filteredPoints.map(\.measuredAt)
+		let desiredCount = spansMultipleYears ? 3 : 4
+		guard let first = dates.first,
+			let last = dates.last else { return [] }
+
+		let candidates: [Date]
+		if dates.count <= desiredCount {
+			candidates = dates
+		} else {
+			let span = last.timeIntervalSince(first)
+			let targets = (0..<desiredCount).map { position in
+				first.addingTimeInterval(span * Double(position) / Double(desiredCount - 1))
+			}
+			var selected: [Date] = []
+			for target in targets {
+				guard let nearest = dates.min(by: {
+					abs($0.timeIntervalSince(target)) < abs($1.timeIntervalSince(target))
+				}) else { continue }
+				if !selected.contains(nearest) { selected.append(nearest) }
+			}
+			candidates = selected.sorted()
+		}
+
+		return removingCrowdedAxisDates(
+			from: candidates,
+			first: first,
+			last: last
+		)
+	}
+
+	/// 临近记录仍保留数据点，但省略可能互相覆盖的中间日期标签。
+	private func removingCrowdedAxisDates(
+		from dates: [Date],
+		first: Date,
+		last: Date
+	) -> [Date] {
+		let span = last.timeIntervalSince(first)
+		guard span > 0 else { return [first] }
+		guard dates.count > 2 else {
+			let sameDay = Calendar.current.isDate(first, inSameDayAs: last)
+			return sameDay ? [first] : dates
+		}
+
+		let minimumGap = span * (spansMultipleYears ? 0.24 : 0.2)
+		var result = [first]
+		for date in dates.dropFirst().dropLast() {
+			guard let previous = result.last,
+				date.timeIntervalSince(previous) >= minimumGap,
+				last.timeIntervalSince(date) >= minimumGap else { continue }
+			result.append(date)
+		}
+		if last != first { result.append(last) }
+		return result
+	}
+
+	private var spansMultipleYears: Bool {
+		guard let first = filteredPoints.first?.measuredAt,
+			let last = filteredPoints.last?.measuredAt else { return false }
+		let calendar = Calendar.current
+		return calendar.component(.year, from: first) != calendar.component(.year, from: last)
+	}
+
+	private var lineInterpolation: InterpolationMethod {
+		spansMultipleYears ? .linear : .monotone
 	}
 
 	private var stats: TrendStats {
