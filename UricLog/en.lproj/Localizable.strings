@@ -169,3 +169,31 @@
 "INTERNAL_SETTINGS" = "Internal Settings";
 "RESET_RESTART_MESSAGE" = "After resetting, fully close and reopen the app. Your uric acid records and settings will not be deleted.";
 "STORE_REGION_REFRESH_MESSAGE" = "On the next launch, the app will use the system region and refresh the App Store region in the background.";
+
+// CSV import
+"DATA_IMPORT" = "Data Import";
+"IMPORT_CSV" = "Import CSV File";
+"IMPORT_CSV_DESCRIPTION" = "Validate the whole file before adding measurements.";
+"IMPORT_CSV_PROGRESS" = "Checking file…";
+"IMPORT_CSV_SAVING" = "Importing measurements…";
+"IMPORT_MODE_TITLE" = "Import measurements";
+"IMPORT_MODE_MESSAGE" = "%d measurements validated. Add them to the existing measurements or replace all measurements?";
+"IMPORT_APPEND" = "Add to existing";
+"IMPORT_REPLACE" = "Replace all measurements";
+"IMPORT_REPLACE_TITLE" = "Replace all measurements?";
+"IMPORT_REPLACE_MESSAGE" = "%d measurements from the file will replace all measurements currently in the app. This cannot be undone.";
+"IMPORT_SUCCESS_TITLE" = "Import complete";
+"IMPORT_SUCCESS_MESSAGE" = "%d measurements imported.";
+"IMPORT_FAILURE_TITLE" = "Import failed";
+"CSV_IMPORT_READ_ERROR" = "Unable to read the selected file.";
+"CSV_IMPORT_SAVE_ERROR" = "The measurements could not be saved. No data was imported or deleted.";
+"CSV_IMPORT_EXISTING_RECORDS" = "The file contains measurements already present in the app. Choose Replace all measurements or select another file.";
+"CSV_IMPORT_EMPTY" = "The file contains no measurements. Existing measurements were kept.";
+"IMPORT_INVALID_ENCODING" = "The file must contain valid UTF-8 text.";
+"IMPORT_INVALID_HEADER" = "The CSV header must be: id,measured_at,value,unit,note,created_at,updated_at";
+"IMPORT_EMPTY_FILE" = "The file contains no measurements. Nothing was imported.";
+"IMPORT_MALFORMED_CSV" = "Invalid CSV syntax at line %d. Nothing was imported.";
+"IMPORT_INVALID_FIELD" = "Invalid value for %@ at line %d. Nothing was imported.";
+"IMPORT_DUPLICATE_ID" = "Duplicate measurement ID at line %d. Nothing was imported.";
+"IMPORT_INVALID_DATE_ORDER" = "updated_at precedes created_at at line %d. Nothing was imported.";
+"CSV_IMPORT_UNSAVED_CHANGES" = "Finish saving or canceling your current changes before importing.";

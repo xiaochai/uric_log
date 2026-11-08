@@ -169,3 +169,31 @@
 "INTERNAL_SETTINGS" = "Definições internas";
 "RESET_RESTART_MESSAGE" = "Após a reposição, fecha completamente a app e volta a abri-la. As tuas medições de uricemia e definições não serão apagadas.";
 "STORE_REGION_REFRESH_MESSAGE" = "No próximo arranque, a app utilizará a região do sistema e atualizará a região da App Store em segundo plano.";
+
+// CSV import
+"DATA_IMPORT" = "Importação de dados";
+"IMPORT_CSV" = "Importar ficheiro CSV";
+"IMPORT_CSV_DESCRIPTION" = "Verifica o ficheiro completo antes de adicionar as medições.";
+"IMPORT_CSV_PROGRESS" = "A verificar o ficheiro…";
+"IMPORT_CSV_SAVING" = "A importar medições…";
+"IMPORT_MODE_TITLE" = "Importar medições";
+"IMPORT_MODE_MESSAGE" = "%d medições verificadas. Queres adicioná-las às existentes ou substituir todas as medições?";
+"IMPORT_APPEND" = "Adicionar às existentes";
+"IMPORT_REPLACE" = "Substituir todas as medições";
+"IMPORT_REPLACE_TITLE" = "Substituir todas as medições?";
+"IMPORT_REPLACE_MESSAGE" = "As %d medições do ficheiro substituirão todas as medições atualmente guardadas na app. Esta ação não pode ser desfeita.";
+"IMPORT_SUCCESS_TITLE" = "Importação concluída";
+"IMPORT_SUCCESS_MESSAGE" = "%d medições importadas.";
+"IMPORT_FAILURE_TITLE" = "Falha na importação";
+"CSV_IMPORT_READ_ERROR" = "Não foi possível ler o ficheiro selecionado.";
+"CSV_IMPORT_SAVE_ERROR" = "Não foi possível guardar as medições. Nenhum dado foi importado ou apagado.";
+"CSV_IMPORT_EXISTING_RECORDS" = "O ficheiro contém medições que já existem na app. Escolhe Substituir todas as medições ou seleciona outro ficheiro.";
+"CSV_IMPORT_EMPTY" = "O ficheiro não contém medições. As medições existentes foram mantidas.";
+"IMPORT_INVALID_ENCODING" = "O ficheiro tem de conter texto UTF-8 válido.";
+"IMPORT_INVALID_HEADER" = "O cabeçalho CSV tem de ser: id,measured_at,value,unit,note,created_at,updated_at";
+"IMPORT_EMPTY_FILE" = "O ficheiro não contém medições. Nenhum dado foi importado.";
+"IMPORT_MALFORMED_CSV" = "Sintaxe CSV inválida na linha %d. Nenhum dado foi importado.";
+"IMPORT_INVALID_FIELD" = "Valor inválido para %@ na linha %d. Nenhum dado foi importado.";
+"IMPORT_DUPLICATE_ID" = "Identificador de medição duplicado na linha %d. Nenhum dado foi importado.";
+"IMPORT_INVALID_DATE_ORDER" = "updated_at é anterior a created_at na linha %d. Nenhum dado foi importado.";
+"CSV_IMPORT_UNSAVED_CHANGES" = "Guarda ou descarta as alterações atuais antes de importar.";

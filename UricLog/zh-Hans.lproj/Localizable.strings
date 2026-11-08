@@ -164,3 +164,31 @@
 "INTERNAL_SETTINGS" = "内部设置";
 "RESET_RESTART_MESSAGE" = "重置后请彻底关闭并重新打开 App。尿酸记录和设置不会被删除。";
 "STORE_REGION_REFRESH_MESSAGE" = "下次启动将使用系统地区，并在后台重新获取 App Store 地区。";
+
+// CSV import
+"DATA_IMPORT" = "数据导入";
+"IMPORT_CSV" = "导入 CSV 文件";
+"IMPORT_CSV_DESCRIPTION" = "添加测量记录前，先检查整个文件。";
+"IMPORT_CSV_PROGRESS" = "正在检查文件…";
+"IMPORT_CSV_SAVING" = "正在导入测量记录…";
+"IMPORT_MODE_TITLE" = "导入测量记录";
+"IMPORT_MODE_MESSAGE" = "已验证 %d 条测量记录。要添加到现有记录中，还是替换全部测量记录？";
+"IMPORT_APPEND" = "添加到现有记录";
+"IMPORT_REPLACE" = "替换全部测量记录";
+"IMPORT_REPLACE_TITLE" = "替换全部测量记录？";
+"IMPORT_REPLACE_MESSAGE" = "文件中的 %d 条测量记录将替换应用中现有的全部测量记录。此操作无法撤销。";
+"IMPORT_SUCCESS_TITLE" = "导入完成";
+"IMPORT_SUCCESS_MESSAGE" = "已导入 %d 条测量记录。";
+"IMPORT_FAILURE_TITLE" = "导入失败";
+"CSV_IMPORT_READ_ERROR" = "无法读取所选文件。";
+"CSV_IMPORT_SAVE_ERROR" = "无法保存测量记录。未导入或删除任何数据。";
+"CSV_IMPORT_EXISTING_RECORDS" = "文件包含应用中已存在的测量记录。请选择“替换全部测量记录”或选择其他文件。";
+"CSV_IMPORT_EMPTY" = "文件不包含测量记录。现有测量记录已保留。";
+"IMPORT_INVALID_ENCODING" = "文件必须包含有效的 UTF-8 文本。";
+"IMPORT_INVALID_HEADER" = "CSV 表头必须为：id,measured_at,value,unit,note,created_at,updated_at";
+"IMPORT_EMPTY_FILE" = "文件不包含测量记录。未导入任何数据。";
+"IMPORT_MALFORMED_CSV" = "第 %d 行的 CSV 语法无效。未导入任何数据。";
+"IMPORT_INVALID_FIELD" = "%@ 在第 %d 行的值无效。未导入任何数据。";
+"IMPORT_DUPLICATE_ID" = "第 %d 行的测量记录标识符重复。未导入任何数据。";
+"IMPORT_INVALID_DATE_ORDER" = "第 %d 行的 updated_at 早于 created_at。未导入任何数据。";
+"CSV_IMPORT_UNSAVED_CHANGES" = "请先保存或取消当前更改，再导入文件。";

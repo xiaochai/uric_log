@@ -113,8 +113,8 @@
 "UNIT" = "Unidad";
 "SEX" = "Sexo";
 "SEX_DESCRIPTION" = "Se utiliza para mostrar el intervalo de referencia correspondiente";
-"SEX_MALE" = "Masculino";
-"SEX_FEMALE" = "Femenino";
+"SEX_MALE" = "Hombre";
+"SEX_FEMALE" = "Mujer";
 "ENABLE_TARGET" = "Activar Objetivo";
 "TARGET_DESCRIPTION" = "Establece y sigue un valor objetivo de ácido úrico";
 "TARGET_VALUE" = "Valor Objetivo";
@@ -169,3 +169,31 @@
 "INTERNAL_SETTINGS" = "Ajustes internos";
 "RESET_RESTART_MESSAGE" = "Después del restablecimiento, cierra la app por completo y vuelve a abrirla. Las mediciones de ácido úrico y los ajustes no se eliminarán.";
 "STORE_REGION_REFRESH_MESSAGE" = "En el próximo inicio, la app utilizará la región configurada en el sistema y actualizará en segundo plano la del App Store.";
+
+// CSV import
+"DATA_IMPORT" = "Importación de datos";
+"IMPORT_CSV" = "Importar archivo CSV";
+"IMPORT_CSV_DESCRIPTION" = "Comprueba todo el archivo antes de añadir las mediciones.";
+"IMPORT_CSV_PROGRESS" = "Comprobando el archivo…";
+"IMPORT_CSV_SAVING" = "Importando mediciones…";
+"IMPORT_MODE_TITLE" = "Importar mediciones";
+"IMPORT_MODE_MESSAGE" = "%d mediciones comprobadas. ¿Quieres añadirlas a las existentes o sustituir todas las mediciones?";
+"IMPORT_APPEND" = "Añadir a las existentes";
+"IMPORT_REPLACE" = "Sustituir todas las mediciones";
+"IMPORT_REPLACE_TITLE" = "¿Sustituir todas las mediciones?";
+"IMPORT_REPLACE_MESSAGE" = "Las %d mediciones del archivo sustituirán todas las mediciones guardadas en la app. Esta acción no se puede deshacer.";
+"IMPORT_SUCCESS_TITLE" = "Importación completada";
+"IMPORT_SUCCESS_MESSAGE" = "%d mediciones importadas.";
+"IMPORT_FAILURE_TITLE" = "Error de importación";
+"CSV_IMPORT_READ_ERROR" = "No se puede leer el archivo seleccionado.";
+"CSV_IMPORT_SAVE_ERROR" = "No se han podido guardar las mediciones. No se ha importado ni eliminado ningún dato.";
+"CSV_IMPORT_EXISTING_RECORDS" = "El archivo contiene mediciones que ya están en la app. Elige Sustituir todas las mediciones o selecciona otro archivo.";
+"CSV_IMPORT_EMPTY" = "El archivo no contiene mediciones. Se han conservado las mediciones existentes.";
+"IMPORT_INVALID_ENCODING" = "El archivo debe contener texto UTF-8 válido.";
+"IMPORT_INVALID_HEADER" = "La cabecera CSV debe ser: id,measured_at,value,unit,note,created_at,updated_at";
+"IMPORT_EMPTY_FILE" = "El archivo no contiene mediciones. No se ha importado ningún dato.";
+"IMPORT_MALFORMED_CSV" = "Sintaxis CSV no válida en la línea %d. No se ha importado ningún dato.";
+"IMPORT_INVALID_FIELD" = "Valor no válido para %@ en la línea %d. No se ha importado ningún dato.";
+"IMPORT_DUPLICATE_ID" = "Identificador de medición duplicado en la línea %d. No se ha importado ningún dato.";
+"IMPORT_INVALID_DATE_ORDER" = "updated_at es anterior a created_at en la línea %d. No se ha importado ningún dato.";
+"CSV_IMPORT_UNSAVED_CHANGES" = "Guarda o descarta los cambios actuales antes de importar.";

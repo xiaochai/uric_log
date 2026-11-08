@@ -18,13 +18,13 @@ struct TrendsView: View {
 	var body: some View {
 		ScrollView {
 			VStack(spacing: 20) {
-				// 时间范围选择器
+				// Time range selector
 				timeRangeCard
 				
-				// 趋势图
+				// Trend chart
 				trendChartCard
 				
-				// 统计卡片
+				// Statistics card
 				statsCard
 			}
 			.padding()
@@ -36,7 +36,7 @@ struct TrendsView: View {
 			}
 		}
 	
-	// MARK: - 时间范围卡片
+	// MARK: - Time range card
 	private var timeRangeCard: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			HStack {
@@ -63,7 +63,7 @@ struct TrendsView: View {
 		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
 	}
 	
-	// MARK: - 趋势图卡片
+	// MARK: - Trend chart card
 	private var trendChartCard: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			HStack {
@@ -151,7 +151,7 @@ struct TrendsView: View {
 				.accessibilityLabel(L10n.format("CHART_Y_AXIS_UNIT", preferredUnit.displayName))
 
 			Chart {
-			// 单条记录只显示数据点；多条记录使用不过冲的平滑曲线连接。
+			// Show a single reading as a point; connect multiple readings with a smooth curve that avoids overshoot.
 			if filteredPoints.count > 1 {
 				ForEach(filteredPoints, id: \.recordID) { point in
 					LineMark(
@@ -170,7 +170,7 @@ struct TrendsView: View {
 				}
 			}
 
-			// 数据点
+			// Data points
 			ForEach(filteredPoints, id: \.recordID) { point in
 				PointMark(
 					x: .value(L10n.string("TIME"), point.measuredAt),
@@ -249,15 +249,10 @@ struct TrendsView: View {
 	}
 
 	private func axisValue(_ value: Double) -> String {
-		switch preferredUnit {
-		case .umolL:
-			return value.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(0)))
-		case .mgdL:
-			return value.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(1)))
-		}
+		value.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(2)))
 	}
 	
-	// MARK: - 统计卡片
+	// MARK: - Statistics card
 	private var statsCard: some View {
 		VStack(alignment: .leading, spacing: 12) {
 			HStack {
@@ -351,13 +346,13 @@ struct TrendsView: View {
 			filtered = source
 		}
 		return filtered.map { record in
-			let convertedValue = UricUnit.convert(value: record.value, from: record.unit, to: preferredUnit)
+			let convertedValue = UricUnit.convertWithoutRounding(value: record.value, from: record.unit, to: preferredUnit)
 			return TrendPoint(
 				recordID: record.id,
 				measuredAt: record.measuredAt,
 				value: convertedValue,
-				unit: preferredUnit
-				,normalUpperUmol: userGender.normalRangeUpper
+				valueInMicromoles: UricUnit.convertWithoutRounding(value: record.value, from: record.unit, to: .umolL),
+				normalUpperUmol: userGender.normalRangeUpper
 			)
 		}
 	}
@@ -370,7 +365,8 @@ struct TrendsView: View {
 		)
 	}
 
-	/// 横轴刻度吸附到真实记录日期。跨年时减少为 3 个，避免标签拥挤。
+	/// Snap x-axis ticks to actual record dates. When the data spans multiple years,
+	/// use three ticks to avoid crowded labels.
 	private var xAxisDates: [Date] {
 		let dates = filteredPoints.map(\.measuredAt)
 		let desiredCount = spansMultipleYears ? 3 : 4
@@ -402,7 +398,7 @@ struct TrendsView: View {
 		)
 	}
 
-	/// 临近记录仍保留数据点，但省略可能互相覆盖的中间日期标签。
+	/// Keep data points for nearby records, but omit intermediate date labels that could overlap.
 	private func removingCrowdedAxisDates(
 		from dates: [Date],
 		first: Date,
@@ -439,18 +435,13 @@ struct TrendsView: View {
 	}
 
 	private var stats: TrendStats {
-		let values = filteredPoints.map(\.value)
-		let average = values.isEmpty ? 0 : (values.reduce(0, +) / Double(values.count))
-		let minValue = values.min() ?? 0
-		let maxValue = values.max() ?? 0
-		let latest = values.last ?? 0
-		let targetRate: Double
-		if targetEnabled, !values.isEmpty {
-			targetRate = Double(values.filter { $0 <= targetValue }.count) / Double(values.count)
-		} else {
-			targetRate = 0
-		}
-		return TrendStats(average: average, min: minValue, max: maxValue, latest: latest, targetRate: targetRate)
+		TrendStats.calculate(
+			valuesInMicromoles: filteredPoints.map(\.valueInMicromoles),
+			targetInMicromoles: targetEnabled
+				? UricUnit.convertWithoutRounding(value: targetValue, from: preferredUnit, to: .umolL)
+				: nil,
+			unit: preferredUnit
+		)
 	}
 
 	private var userGender: UserGender {
@@ -458,12 +449,12 @@ struct TrendsView: View {
 	}
 
 	private func formatValue(_ value: Double) -> String {
-		value.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(0...4)))
+		value.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(2)))
 	}
 
 	private func formatDelta(_ delta: Double) -> String {
 		let sign = delta > 0 ? "+" : ""
-		return "\(sign)\(delta.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(0...4))))"
+		return "\(sign)\(delta.formatted(.number.locale(AppLanguage.selected.locale).precision(.fractionLength(2))))"
 	}
 }
 
@@ -498,7 +489,7 @@ enum TrendYAxis {
 	}
 }
 
-// MARK: - 统计项视图
+// MARK: - Statistics item view
 private struct StatItemView: View {
 	let title: String
 	let value: String
@@ -529,7 +520,7 @@ private struct StatItemView: View {
 	}
 }
 
-// MARK: - 目标统计视图
+// MARK: - Target statistics view
 private struct TargetStatView: View {
 	let title: String
 	let value: String
@@ -565,12 +556,12 @@ private struct TrendPoint {
 	let recordID: UUID
 	let measuredAt: Date
 	let value: Double
-	let unit: UricUnit
+	let valueInMicromoles: Double
 	let normalUpperUmol: Double
 	
 	var valueColor: Color {
-		let umolValue = UricUnit.convert(value: value, from: unit, to: .umolL)
-		if umolValue <= normalUpperUmol {
+		let umolValue = valueInMicromoles
+		if UricUnit.isAtOrBelow(umolValue, upperBound: normalUpperUmol) {
 			return .green
 		}
 		let delta = umolValue - normalUpperUmol
@@ -587,4 +578,23 @@ private struct TrendStats {
 	let max: Double
 	let latest: Double
 	let targetRate: Double
+
+	/// Calculate from original values; round only when formatting for display.
+	static func calculate(valuesInMicromoles: [Double], targetInMicromoles: Double?, unit: UricUnit) -> TrendStats {
+		let values = valuesInMicromoles.filter(\.isFinite)
+		let average = values.isEmpty ? 0 : values.reduce(0, +) / Double(values.count)
+		let targetRate: Double
+		if let targetInMicromoles, targetInMicromoles.isFinite, !values.isEmpty {
+			targetRate = Double(values.filter { UricUnit.isAtOrBelow($0, upperBound: targetInMicromoles) }.count) / Double(values.count)
+		} else {
+			targetRate = 0
+		}
+		return TrendStats(
+			average: UricUnit.convertWithoutRounding(value: average, from: .umolL, to: unit),
+			min: UricUnit.convertWithoutRounding(value: values.min() ?? 0, from: .umolL, to: unit),
+			max: UricUnit.convertWithoutRounding(value: values.max() ?? 0, from: .umolL, to: unit),
+			latest: UricUnit.convertWithoutRounding(value: values.last ?? 0, from: .umolL, to: unit),
+			targetRate: targetRate
+		)
+	}
 }

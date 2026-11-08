@@ -39,7 +39,7 @@ enum AppStoreRegion {
 	}
 }
 
-enum UricUnit: String, CaseIterable, Identifiable, Codable {
+enum UricUnit: String, CaseIterable, Identifiable, Codable, Sendable {
 	case umolL
 	case mgdL
 
@@ -54,16 +54,30 @@ enum UricUnit: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 
+	/// Preserve full precision; decimal formatting belongs only in the interface.
 	static func convert(value: Double, from: UricUnit, to: UricUnit) -> Double {
 		guard from != to else { return value }
 		switch (from, to) {
 		case (.umolL, .mgdL):
-			return value / 59.48
+			return (value * 168.1103) / 10000
 		case (.mgdL, .umolL):
-			return value * 59.48
+			return (value * 10000) / 168.1103
 		default:
 			return value
 		}
+	}
+
+	/// Explicit alias for callers that require an unrounded conversion.
+	static func convertWithoutRounding(value: Double, from: UricUnit, to: UricUnit) -> Double {
+		convert(value: value, from: from, to: to)
+	}
+
+	/// Ignore only floating-point noise introduced by unit conversion.
+	static func isAtOrBelow(_ value: Double, upperBound: Double) -> Bool {
+		if value <= upperBound { return true }
+		guard value.isFinite, upperBound.isFinite else { return false }
+		let tolerance = max(value.ulp, upperBound.ulp) * 4
+		return value - upperBound <= tolerance
 	}
 }
 
@@ -105,7 +119,7 @@ enum UserGender: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 	
-	/// 正常范围上限（μmol/L）
+	/// Upper limit of the normal range (μmol/L).
 	var normalRangeUpper: Double {
 		switch self {
 		case .male:
@@ -115,7 +129,7 @@ enum UserGender: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 	
-	/// 正常范围下限（μmol/L）
+	/// Lower limit of the normal range (μmol/L).
 	var normalRangeLower: Double {
 		switch self {
 		case .male:
@@ -125,15 +139,15 @@ enum UserGender: String, CaseIterable, Identifiable, Codable {
 		}
 	}
 	
-	/// 获取当前单位的正常范围显示文本
+	/// Return the normal range as display text in the specified unit.
 	func normalRangeText(unit: UricUnit) -> String {
-		let lower = UricUnit.convert(value: normalRangeLower, from: .umolL, to: unit)
-		let upper = UricUnit.convert(value: normalRangeUpper, from: .umolL, to: unit)
-		let format = unit == .umolL ? "%.0f" : "%.1f"
-		return String(
-			format: "\(format)-\(format) \(unit.displayName)",
-			locale: AppLanguage.selected.locale, lower, upper
-		)
+		let lower = UricUnit.convertWithoutRounding(value: normalRangeLower, from: .umolL, to: unit)
+		let upper = UricUnit.convertWithoutRounding(value: normalRangeUpper, from: .umolL, to: unit)
+		let format = FloatingPointFormatStyle<Double>.number
+			.locale(AppLanguage.selected.locale)
+			.grouping(.never)
+			.precision(.fractionLength(2))
+		return "\(lower.formatted(format))-\(upper.formatted(format)) \(unit.displayName)"
 	}
 }
 

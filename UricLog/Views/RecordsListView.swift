@@ -17,10 +17,10 @@ struct RecordsListView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // 时间范围选择器
+                // Time range picker
                 timeRangePicker
                 
-                // 记录列表
+                // Records list
                 recordsSection
             }
             .padding()
@@ -323,19 +323,19 @@ struct RecordCard: View {
     
 	private var valueString: String {
 		displayValue.formatted(
-			.number.locale(AppLanguage.selected.locale).precision(.fractionLength(0...4))
+			.number.locale(AppLanguage.selected.locale).precision(.fractionLength(2))
 		)
 	}
 
 	private var displayValue: Double {
-		UricUnit.convert(value: record.value, from: record.unit, to: displayUnit)
+		UricUnit.convertWithoutRounding(value: record.value, from: record.unit, to: displayUnit)
 	}
     
     private var valueColor: Color {
         let value = record.value
-		let umolValue = UricUnit.convert(value: value, from: record.unit, to: .umolL)
+		let umolValue = UricUnit.convertWithoutRounding(value: value, from: record.unit, to: .umolL)
 		let upper = userGender.normalRangeUpper
-		if umolValue <= upper {
+		if UricUnit.isAtOrBelow(umolValue, upperBound: upper) {
 			return .green
 		}
 		let delta = umolValue - upper
