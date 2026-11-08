@@ -19,8 +19,9 @@ enum CSVExporter {
 
 		var csv = header
 		for record in records.sorted(by: { $0.measuredAt < $1.measuredAt }) {
-			let convertedValue = UricUnit.convert(value: record.value, from: record.unit, to: preferredUnit)
-			let valueString = String(format: "%.2f", convertedValue)
+			let convertedValue = UricUnit.convertWithoutRounding(value: record.value, from: record.unit, to: preferredUnit)
+			// Round-trip text preserves the full Double value independently of locale.
+			let valueString = String(convertedValue)
 			let note = (record.note ?? "").replacingOccurrences(of: "\"", with: "\"\"")
 			let measuredAt = formatter.string(from: record.measuredAt)
 			let createdAt = formatter.string(from: record.createdAt)
@@ -29,11 +30,15 @@ enum CSVExporter {
 		}
 
 		let fileName = "uric_log_\(Int(Date().timeIntervalSince1970)).csv"
-		let url = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+		let directory = FileManager.default.temporaryDirectory
+			.appendingPathComponent("UricLogExports", isDirectory: true)
+			.appendingPathComponent(UUID().uuidString, isDirectory: true)
+		let url = directory.appendingPathComponent(fileName)
 		guard let data = csv.data(using: .utf8) else {
 			throw ExportError.failedToWrite
 		}
 		do {
+			try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
 			try data.write(to: url, options: .atomic)
 			return url
 		} catch {

@@ -113,8 +113,8 @@
 "UNIT" = "Unità";
 "SEX" = "Sesso";
 "SEX_DESCRIPTION" = "Utilizzato per mostrare l'intervallo di riferimento corrispondente";
-"SEX_MALE" = "Maschile";
-"SEX_FEMALE" = "Femminile";
+"SEX_MALE" = "Maschio";
+"SEX_FEMALE" = "Femmina";
 "ENABLE_TARGET" = "Attiva Obiettivo";
 "TARGET_DESCRIPTION" = "Imposta e monitora un valore obiettivo per l'uricemia";
 "TARGET_VALUE" = "Valore Obiettivo";
@@ -169,3 +169,31 @@
 "INTERNAL_SETTINGS" = "Impostazioni interne";
 "RESET_RESTART_MESSAGE" = "Dopo il ripristino, chiudi completamente l'app e riaprila. Le registrazioni dell'uricemia e le impostazioni non verranno eliminate.";
 "STORE_REGION_REFRESH_MESSAGE" = "Al prossimo avvio, l'app utilizzerà l'area geografica impostata nel sistema e aggiornerà in background quella dell'App Store.";
+
+// CSV import
+"DATA_IMPORT" = "Importazione dati";
+"IMPORT_CSV" = "Importa file CSV";
+"IMPORT_CSV_DESCRIPTION" = "Verifica l’intero file prima di aggiungere le misurazioni.";
+"IMPORT_CSV_PROGRESS" = "Verifica del file…";
+"IMPORT_CSV_SAVING" = "Importazione delle misurazioni…";
+"IMPORT_MODE_TITLE" = "Importa misurazioni";
+"IMPORT_MODE_MESSAGE" = "%d misurazioni verificate. Vuoi aggiungerle a quelle esistenti oppure sostituire tutte le misurazioni?";
+"IMPORT_APPEND" = "Aggiungi a quelle esistenti";
+"IMPORT_REPLACE" = "Sostituisci tutte le misurazioni";
+"IMPORT_REPLACE_TITLE" = "Sostituire tutte le misurazioni?";
+"IMPORT_REPLACE_MESSAGE" = "Le %d misurazioni del file sostituiranno tutte le misurazioni presenti nell’app. Questa operazione non può essere annullata.";
+"IMPORT_SUCCESS_TITLE" = "Importazione completata";
+"IMPORT_SUCCESS_MESSAGE" = "%d misurazioni importate.";
+"IMPORT_FAILURE_TITLE" = "Importazione non riuscita";
+"CSV_IMPORT_READ_ERROR" = "Impossibile leggere il file selezionato.";
+"CSV_IMPORT_SAVE_ERROR" = "Impossibile salvare le misurazioni. Nessun dato è stato importato o eliminato.";
+"CSV_IMPORT_EXISTING_RECORDS" = "Il file contiene misurazioni già presenti nell’app. Scegli Sostituisci tutte le misurazioni oppure seleziona un altro file.";
+"CSV_IMPORT_EMPTY" = "Il file non contiene misurazioni. Le misurazioni esistenti sono state conservate.";
+"IMPORT_INVALID_ENCODING" = "Il file deve contenere testo UTF-8 valido.";
+"IMPORT_INVALID_HEADER" = "L’intestazione CSV deve essere: id,measured_at,value,unit,note,created_at,updated_at";
+"IMPORT_EMPTY_FILE" = "Il file non contiene misurazioni. Nessun dato è stato importato.";
+"IMPORT_MALFORMED_CSV" = "Sintassi CSV non valida alla riga %d. Nessun dato è stato importato.";
+"IMPORT_INVALID_FIELD" = "Valore non valido per %@ alla riga %d. Nessun dato è stato importato.";
+"IMPORT_DUPLICATE_ID" = "Identificativo di misurazione duplicato alla riga %d. Nessun dato è stato importato.";
+"IMPORT_INVALID_DATE_ORDER" = "updated_at precede created_at alla riga %d. Nessun dato è stato importato.";
+"CSV_IMPORT_UNSAVED_CHANGES" = "Salva o annulla le modifiche in corso prima di importare.";

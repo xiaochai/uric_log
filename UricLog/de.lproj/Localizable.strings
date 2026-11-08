@@ -169,3 +169,31 @@
 "INTERNAL_SETTINGS" = "Interne Einstellungen";
 "RESET_RESTART_MESSAGE" = "Schließe die App nach dem Zurücksetzen vollständig und öffne sie erneut. Deine Harnsäuremessungen und Einstellungen werden nicht gelöscht.";
 "STORE_REGION_REFRESH_MESSAGE" = "Beim nächsten Start verwendet die App die Systemregion und aktualisiert die App Store-Region im Hintergrund.";
+
+// CSV import
+"DATA_IMPORT" = "Datenimport";
+"IMPORT_CSV" = "CSV-Datei importieren";
+"IMPORT_CSV_DESCRIPTION" = "Prüfe die gesamte Datei, bevor Messungen hinzugefügt werden.";
+"IMPORT_CSV_PROGRESS" = "Datei wird geprüft…";
+"IMPORT_CSV_SAVING" = "Messungen werden importiert…";
+"IMPORT_MODE_TITLE" = "Messungen importieren";
+"IMPORT_MODE_MESSAGE" = "%d Messungen geprüft. Zu den vorhandenen Messungen hinzufügen oder alle Messungen ersetzen?";
+"IMPORT_APPEND" = "Zu vorhandenen hinzufügen";
+"IMPORT_REPLACE" = "Alle Messungen ersetzen";
+"IMPORT_REPLACE_TITLE" = "Alle Messungen ersetzen?";
+"IMPORT_REPLACE_MESSAGE" = "Die %d Messungen aus der Datei ersetzen alle Messungen, die derzeit in der App gespeichert sind. Dies kann nicht rückgängig gemacht werden.";
+"IMPORT_SUCCESS_TITLE" = "Import abgeschlossen";
+"IMPORT_SUCCESS_MESSAGE" = "%d Messungen importiert.";
+"IMPORT_FAILURE_TITLE" = "Import fehlgeschlagen";
+"CSV_IMPORT_READ_ERROR" = "Die ausgewählte Datei kann nicht gelesen werden.";
+"CSV_IMPORT_SAVE_ERROR" = "Die Messungen konnten nicht gespeichert werden. Es wurden keine Daten importiert oder gelöscht.";
+"CSV_IMPORT_EXISTING_RECORDS" = "Die Datei enthält Messungen, die bereits in der App vorhanden sind. Wähle Alle Messungen ersetzen oder eine andere Datei.";
+"CSV_IMPORT_EMPTY" = "Die Datei enthält keine Messungen. Vorhandene Messungen wurden beibehalten.";
+"IMPORT_INVALID_ENCODING" = "Die Datei muss gültigen UTF-8-Text enthalten.";
+"IMPORT_INVALID_HEADER" = "Die CSV-Kopfzeile muss lauten: id,measured_at,value,unit,note,created_at,updated_at";
+"IMPORT_EMPTY_FILE" = "Die Datei enthält keine Messungen. Es wurden keine Daten importiert.";
+"IMPORT_MALFORMED_CSV" = "Ungültige CSV-Syntax in Zeile %d. Es wurden keine Daten importiert.";
+"IMPORT_INVALID_FIELD" = "Ungültiger Wert für %@ in Zeile %d. Es wurden keine Daten importiert.";
+"IMPORT_DUPLICATE_ID" = "Doppelte Messungs-ID in Zeile %d. Es wurden keine Daten importiert.";
+"IMPORT_INVALID_DATE_ORDER" = "updated_at liegt vor created_at in Zeile %d. Es wurden keine Daten importiert.";
+"CSV_IMPORT_UNSAVED_CHANGES" = "Speichere oder verwirf deine aktuellen Änderungen vor dem Import.";

@@ -105,8 +105,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 			let targetInMicromoles = hasSavedTarget
 				? userDefaults.double(forKey: AppSettingsKey.targetValue)
 				: 420
-			let target = UricUnit.convert(value: targetInMicromoles, from: .umolL, to: unit)
-			userDefaults.set((target * 10_000).rounded() / 10_000, forKey: AppSettingsKey.targetValue)
+			let target = UricUnit.convertWithoutRounding(value: targetInMicromoles, from: .umolL, to: unit)
+			userDefaults.set(target, forKey: AppSettingsKey.targetValue)
 		}
 		if savedUnit == nil {
 			userDefaults.set(unit.rawValue, forKey: AppSettingsKey.preferredUnit)

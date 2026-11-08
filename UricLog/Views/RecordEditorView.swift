@@ -33,19 +33,19 @@ struct RecordEditorView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // 数值输入卡片
+                // Value input card
                 valueInputCard
                 
-                // 参考范围卡片
+                // Reference range card
                 referenceRangeCard
                 
-                // 时间选择卡片
+                // Time selection card
                 timeSelectionCard
                 
-                // 备注卡片
+                // Notes card
                 noteCard
                 
-                // 保存按钮
+                // Save button
                 saveButton
             }
             .padding()
@@ -180,7 +180,7 @@ struct RecordEditorView: View {
 				.accessibilityLabel("SOURCES_AND_REFERENCES")
             }
             
-            // 当前性别对应的正常范围
+            // Normal range for the selected gender
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text(L10n.format("PERSONAL_REFERENCE_RANGE", userGender.displayName))
@@ -243,7 +243,7 @@ struct RecordEditorView: View {
                     Text("GOUT")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("< 360 μmol/L")
+                    Text("< \(formatValue(360)) \(selectedUnit.displayName)")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(umolValue < 360 ? .green : .secondary)
                 }
@@ -252,7 +252,7 @@ struct RecordEditorView: View {
                     Text("TOPHI_OR_FREQUENT_FLARES")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Text("< 300 μmol/L")
+                    Text("< \(formatValue(300)) \(selectedUnit.displayName)")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundStyle(umolValue < 300 ? .green : .secondary)
                 }
@@ -457,7 +457,9 @@ struct RecordEditorView: View {
     }
 
     private var parsedValue: Double? {
-        MeasurementValueText.parse(valueText)
+        MeasurementValueText.valueForSaving(
+            valueText, originalValue: record?.value, locale: AppLanguage.selected.locale
+        )
     }
     
     private var userGender: UserGender {
@@ -477,17 +479,15 @@ struct RecordEditorView: View {
     }
 
     private func looksExtreme(value: Double, unit: UricUnit) -> Bool {
-        let umolValue = UricUnit.convert(value: value, from: unit, to: .umolL)
+        let umolValue = UricUnit.convertWithoutRounding(value: value, from: unit, to: .umolL)
         return umolValue < 50 || umolValue > 1200
     }
     
     private func formatValue(_ value: Double) -> String {
-        let converted = UricUnit.convert(value: value, from: .umolL, to: selectedUnit)
-        if selectedUnit == .umolL {
-            return String(format: "%.0f", converted)
-        } else {
-            return String(format: "%.1f", converted)
-        }
+        let converted = UricUnit.convertWithoutRounding(value: value, from: .umolL, to: selectedUnit)
+        return converted.formatted(
+            .number.locale(AppLanguage.selected.locale).precision(.fractionLength(2))
+        )
     }
 
     private func save(value: Double) {
@@ -520,15 +520,23 @@ struct RecordEditorView: View {
 	}
 }
 
-/// Add and edit share the same decimal parser. Never round an existing reading
-/// just to populate the editor: saving a note must not change its measurement.
+/// Display two decimals while preserving the original value on an unchanged edit.
+/// Saving a note, date or unit correction must not discard hidden decimal places.
 enum MeasurementValueText {
     static func editing(_ value: Double, locale: Locale) -> String {
         value.formatted(
             .number.locale(locale)
                 .grouping(.never)
-                .precision(.fractionLength(2...17))
+                .precision(.fractionLength(2))
         )
+    }
+
+    static func valueForSaving(_ text: String, originalValue: Double?, locale: Locale) -> Double? {
+        guard let value = parse(text) else { return nil }
+        if let originalValue, text == editing(originalValue, locale: locale) {
+            return originalValue
+        }
+        return value
     }
 
     static func parse(_ text: String) -> Double? {
@@ -539,7 +547,7 @@ enum MeasurementValueText {
     }
 }
 
-// MARK: - 参考信息详情页
+// MARK: - Reference information details
 struct ReferenceInfoSheet: View {
     @Environment(\.dismiss) private var dismiss
     
@@ -547,13 +555,13 @@ struct ReferenceInfoSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // 单位换算说明
+                    // Unit conversion explanation
                     unitConversionSection
                     
-                    // 正常范围
+                    // Normal range
                     normalRangeSection
                     
-                    // 注意事项
+                    // Precautions
                     noticeSection
 					
 					sourcesSection
@@ -575,7 +583,12 @@ struct ReferenceInfoSheet: View {
     }
     
     private var unitConversionSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        let molarMassText = 168.1103.formatted(
+            .number.locale(AppLanguage.selected.locale)
+                .grouping(.never)
+                .precision(.fractionLength(4))
+        )
+        return VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Image(systemName: "ruler.fill")
                     .foregroundStyle(.blue)
@@ -585,7 +598,9 @@ struct ReferenceInfoSheet: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("1 mg/dL ≈ 59.48 μmol/L")
+                Text(verbatim: "μmol/L = mg/dL × 10000 ÷ \(molarMassText)")
+                    .font(.system(size: 16, weight: .medium))
+                Text(verbatim: "mg/dL = μmol/L × \(molarMassText) ÷ 10000")
                     .font(.system(size: 16, weight: .medium))
                 Text("COMMON_UNITS")
                     .font(.caption)
@@ -619,32 +634,30 @@ struct ReferenceInfoSheet: View {
 			VStack(spacing: 12) {
 				normalRangeRow(
 					title: "ADULT_MEN",
-					range: "208～428 μmol/L",
-					subRange: "(3.5～7.2 mg/dL)"
+					gender: .male
 				)
 				
 				normalRangeRow(
 					title: "ADULT_WOMEN",
-					range: "155～357 μmol/L",
-					subRange: "(2.6～6.0 mg/dL)"
+					gender: .female
 				)
 			}
         }
     }
     
-    private func normalRangeRow(title: String, range: String, subRange: String) -> some View {
+    private func normalRangeRow(title: String, gender: UserGender) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(LocalizedStringKey(title))
                     .font(.system(size: 15, weight: .medium))
-                Text(LocalizedStringKey(subRange))
+                Text("(\(gender.normalRangeText(unit: .mgdL)))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
             
             Spacer()
             
-            Text(range)
+            Text(gender.normalRangeText(unit: .umolL))
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.green)
         }

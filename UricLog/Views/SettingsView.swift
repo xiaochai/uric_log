@@ -1,5 +1,7 @@
 import SwiftUI
 import CoreData
+import UIKit
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
 	@Environment(\.managedObjectContext) private var viewContext
@@ -22,7 +24,15 @@ struct SettingsView: View {
 
 	@State private var exportRange: TimeRange = .days90
 	@State private var exportURL: URL?
+	@State private var csvShare: CSVShareItem?
 	@State private var exportError: String?
+	@State private var showingCSVImporter = false
+	@State private var isValidatingImport = false
+	@State private var isImporting = false
+	@State private var pendingImport: CSVImportPreview?
+	@State private var importSaveError: String?
+	@State private var importNotice: CSVImportNotice?
+	@State private var completedImportCount: Int?
 	@State private var showingRestartHint = false
 	@State private var lastPreferredUnitRawValue: String = UricUnit.umolL.rawValue
 	@State private var showingNotificationPermissionAlert = false
@@ -36,15 +46,18 @@ struct SettingsView: View {
 	var body: some View {
 		ScrollView {
 			VStack(spacing: 20) {
-				// 偏好设置
+				// Preferences
 				preferencesCard
 
 				reminderCard
 				
-				// 导出设置
+				// Export settings
 				exportCard
+					.disabled(isValidatingImport || isImporting)
+
+				importCard
 				
-				// 关于
+				// About
 				aboutCard
 			}
 			.padding()
@@ -55,6 +68,34 @@ struct SettingsView: View {
 		}
 		.background(Color(.systemGroupedBackground))
 		.navigationTitle("TAB_SETTINGS")
+		.sheet(item: $csvShare) { item in
+			CSVShareSheet(url: item.url)
+		}
+		.fileImporter(
+			isPresented: $showingCSVImporter,
+			allowedContentTypes: [.commaSeparatedText],
+			allowsMultipleSelection: false,
+			onCompletion: prepareCSVImport
+		)
+		.sheet(item: $pendingImport, onDismiss: importReviewDismissed) { preview in
+			CSVImportReviewSheet(
+				count: preview.document.records.count,
+				isImporting: isImporting,
+				saveError: $importSaveError,
+				onImport: performCSVImport
+			)
+		}
+		.alert(
+			importNotice?.title ?? "",
+			isPresented: Binding(
+				get: { importNotice != nil },
+				set: { if !$0 { importNotice = nil } }
+			)
+		) {
+			Button("OK", role: .cancel) { importNotice = nil }
+		} message: {
+			Text(importNotice?.message ?? "")
+		}
 		.alert("RESTART_RECOMMENDED", isPresented: $showingRestartHint) {
 				Button("OK") {
 					Analytics.track("icloud_restart_hint_acknowledged")
@@ -80,15 +121,8 @@ struct SettingsView: View {
 				let oldUnit = UricUnit(rawValue: lastPreferredUnitRawValue) ?? .umolL
 				let newUnit = UricUnit(rawValue: newValue) ?? .umolL
 				if oldUnit != newUnit {
-					targetValue = roundedToFourPlaces(
-						UricUnit.convert(value: targetValue, from: oldUnit, to: newUnit)
-					)
+					targetValue = UricUnit.convertWithoutRounding(value: targetValue, from: oldUnit, to: newUnit)
 					lastPreferredUnitRawValue = newValue
-				}
-			}
-			.onChange(of: focusedField) { oldValue, newValue in
-				if oldValue == .targetValue, newValue != .targetValue {
-					targetValue = roundedToFourPlaces(targetValue)
 				}
 			}
 			.onChange(of: userGenderRawValue) { _, _ in
@@ -102,7 +136,7 @@ struct SettingsView: View {
 			}
 	}
 	
-	// MARK: - 偏好设置卡片
+	// MARK: - Preferences card
 	private var preferencesCard: some View {
 		VStack(alignment: .leading, spacing: 16) {
 			HStack {
@@ -146,7 +180,7 @@ struct SettingsView: View {
 				Divider()
 					.padding(.leading, 44)
 
-				// 单位选择
+				// Unit selection
 				HStack(spacing: 12) {
 					SettingIconView(icon: "ruler.fill", color: .blue)
 					
@@ -173,7 +207,7 @@ struct SettingsView: View {
 				Divider()
 					.padding(.leading, 44)
 				
-				// 性别选择
+				// Gender selection
 				HStack(spacing: 12) {
 					SettingIconView(icon: "person.fill", color: .pink)
 					
@@ -200,7 +234,7 @@ struct SettingsView: View {
 				Divider()
 					.padding(.leading, 44)
 				
-				// 目标值开关
+				// Target value toggle
 				HStack(spacing: 12) {
 					SettingIconView(icon: "target", color: .orange)
 					
@@ -219,7 +253,7 @@ struct SettingsView: View {
 				}
 				.padding(.vertical, 12)
 				
-				// 目标值输入
+				// Target value input
 				if targetEnabled {
 					Divider()
 						.padding(.leading, 44)
@@ -241,7 +275,7 @@ struct SettingsView: View {
 							TextField(
 								"",
 								value: $targetValue,
-								format: .number.precision(.fractionLength(0...4))
+								format: .number.locale(AppLanguage.selected.locale).precision(.fractionLength(2))
 							)
 								.keyboardType(.decimalPad)
 							.focused($focusedField, equals: .targetValue)
@@ -263,10 +297,6 @@ struct SettingsView: View {
 				.fill(Color(.secondarySystemGroupedBackground))
 		)
 		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-	}
-
-	private func roundedToFourPlaces(_ value: Double) -> Double {
-		(value * 10_000).rounded() / 10_000
 	}
 
 	private var reminderCard: some View {
@@ -420,7 +450,7 @@ struct SettingsView: View {
 		}
 	}
 	
-	// MARK: - 导出卡片
+	// MARK: - Export card
 	private var exportCard: some View {
 		VStack(alignment: .leading, spacing: 16) {
 			HStack {
@@ -433,7 +463,7 @@ struct SettingsView: View {
 			}
 			
 			VStack(spacing: 0) {
-				// 导出范围
+				// Export range
 				HStack(spacing: 12) {
 					SettingIconView(icon: "calendar", color: .purple)
 					
@@ -460,7 +490,7 @@ struct SettingsView: View {
 				Divider()
 					.padding(.leading, 44)
 				
-				// 导出按钮
+				// Export button
 				Button(action: exportCSV) {
 					HStack(spacing: 12) {
 						SettingIconView(icon: "doc.text", color: .cyan)
@@ -482,13 +512,16 @@ struct SettingsView: View {
 					}
 				}
 				.padding(.vertical, 12)
+				.accessibilityIdentifier("export-csv-button")
 				
-				// 分享链接
+				// Share link
 				if let exportURL {
 					Divider()
 						.padding(.leading, 44)
 					
-					ShareLink(item: exportURL) {
+					Button {
+						shareCSV(at: exportURL)
+					} label: {
 						HStack(spacing: 12) {
 							SettingIconView(icon: "square.and.arrow.up", color: .indigo)
 							
@@ -506,14 +539,12 @@ struct SettingsView: View {
 								.font(.caption)
 								.foregroundStyle(.secondary)
 						}
-						.simultaneousGesture(TapGesture().onEnded {
-							Analytics.track("csv_share_tapped")
-						})
 					}
 					.padding(.vertical, 12)
+					.accessibilityIdentifier("share-csv-button")
 				}
 				
-				// 错误提示
+				// Error message
 				if let exportError {
 					Divider()
 						.padding(.leading, 44)
@@ -537,7 +568,55 @@ struct SettingsView: View {
 		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
 	}
 	
-	// MARK: - 关于卡片
+	// MARK: - Import card
+	private var importCard: some View {
+		VStack(alignment: .leading, spacing: 16) {
+			HStack {
+				Image(systemName: "square.and.arrow.down.fill")
+					.font(.title3)
+					.foregroundStyle(.blue)
+				Text("DATA_IMPORT")
+					.font(.system(size: 17, weight: .semibold))
+				Spacer()
+			}
+			Button {
+				focusedField = nil
+				importSaveError = nil
+				showingCSVImporter = true
+			} label: {
+				HStack(spacing: 12) {
+					SettingIconView(icon: "square.and.arrow.down", color: .blue)
+					VStack(alignment: .leading, spacing: 4) {
+						Text(LocalizedStringKey(isValidatingImport ? "IMPORT_CSV_PROGRESS" : "IMPORT_CSV"))
+							.font(.system(size: 16))
+							.foregroundStyle(.primary)
+						Text("IMPORT_CSV_DESCRIPTION")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+					Spacer()
+					if isValidatingImport {
+						ProgressView()
+					} else {
+						Image(systemName: "chevron.right")
+							.font(.caption)
+							.foregroundStyle(.secondary)
+					}
+				}
+				.padding(.vertical, 12)
+			}
+			.disabled(isValidatingImport || isImporting)
+			.accessibilityIdentifier("import-csv-button")
+		}
+		.padding()
+		.background(
+			RoundedRectangle(cornerRadius: 16)
+				.fill(Color(.secondarySystemGroupedBackground))
+		)
+		.shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+	}
+
+	// MARK: - About card
 	private var aboutCard: some View {
 		VStack(alignment: .leading, spacing: 16) {
 			HStack {
@@ -550,7 +629,7 @@ struct SettingsView: View {
 			}
 			
 			VStack(spacing: 0) {
-				// iCloud 同步开关
+				// iCloud sync toggle
 				VStack(spacing: 0) {
 					HStack(spacing: 12) {
 						SettingIconView(icon: iCloudEnabled ? "icloud.fill" : "icloud.slash", color: iCloudEnabled ? .blue : .secondary)
@@ -585,7 +664,7 @@ struct SettingsView: View {
 				Divider()
 					.padding(.leading, 44)
 
-				// 版本信息
+				// Version information
 				HStack(spacing: 12) {
 					SettingIconView(icon: "v.square", color: .secondary)
 					
@@ -617,16 +696,78 @@ struct SettingsView: View {
 
 	private func exportCSV() {
 		Analytics.track("csv_export_tapped", properties: ["range": exportRange.rawValue])
+		focusedField = nil
 		exportError = nil
+		exportURL = nil
+		csvShare = nil
 		let preferredUnit = UricUnit(rawValue: preferredUnitRawValue) ?? .umolL
 		let filtered = filterRecords(records: Array(records), range: exportRange)
 		do {
-			exportURL = try CSVExporter.export(records: filtered, preferredUnit: preferredUnit)
+			let url = try CSVExporter.export(records: filtered, preferredUnit: preferredUnit)
+			exportURL = url
 			Analytics.track("csv_export_succeeded")
+			shareCSV(at: url)
 		} catch {
 			exportError = error.localizedDescription
 			Analytics.track("csv_export_failed")
 		}
+	}
+
+	private func shareCSV(at url: URL) {
+		focusedField = nil
+		csvShare = CSVShareItem(url: url)
+		Analytics.track("csv_share_tapped")
+	}
+
+	private func prepareCSVImport(_ result: Result<[URL], Error>) {
+		switch result {
+		case .success(let urls):
+			guard let url = urls.first else { return }
+			isValidatingImport = true
+			importSaveError = nil
+			Task { @MainActor in
+				do {
+					let document = try await Task.detached(priority: .userInitiated) {
+						try CSVImportFileReader.read(url)
+					}.value
+					pendingImport = CSVImportPreview(document: document)
+				} catch {
+					importNotice = CSVImportNotice(
+						title: L10n.string("IMPORT_FAILURE_TITLE"), message: error.localizedDescription
+					)
+				}
+				isValidatingImport = false
+			}
+		case .failure(let error):
+			guard (error as NSError).code != NSUserCancelledError else { return }
+			importNotice = CSVImportNotice(
+				title: L10n.string("IMPORT_FAILURE_TITLE"), message: L10n.string("CSV_IMPORT_READ_ERROR")
+			)
+		}
+	}
+
+	private func performCSVImport(_ mode: CSVImportMode) {
+		guard let document = pendingImport?.document, !isImporting else { return }
+		isImporting = true
+		importSaveError = nil
+		Task { @MainActor in
+			do {
+				completedImportCount = try await CSVImportStore.apply(document, mode: mode, to: persistence.container)
+				pendingImport = nil
+			} catch {
+				importSaveError = error.localizedDescription
+			}
+			isImporting = false
+		}
+	}
+
+	private func importReviewDismissed() {
+		importSaveError = nil
+		guard let count = completedImportCount else { return }
+		completedImportCount = nil
+		importNotice = CSVImportNotice(
+			title: L10n.string("IMPORT_SUCCESS_TITLE"), message: L10n.format("IMPORT_SUCCESS_MESSAGE", count)
+		)
 	}
 
 	private var iCloudStatusColor: Color {
@@ -641,7 +782,122 @@ struct SettingsView: View {
 	}
 }
 
-// MARK: - 设置图标视图
+private struct CSVImportPreview: Identifiable {
+	let id = UUID()
+	let document: CSVImportDocument
+}
+
+private struct CSVImportNotice {
+	let title: String
+	let message: String
+}
+
+private struct CSVImportReviewSheet: View {
+	@Environment(\.dismiss) private var dismiss
+	@State private var confirmingReplacement = false
+	let count: Int
+	let isImporting: Bool
+	@Binding var saveError: String?
+	let onImport: (CSVImportMode) -> Void
+
+	var body: some View {
+		NavigationStack {
+			ScrollView {
+				VStack(spacing: 24) {
+					Image(systemName: "doc.badge.checkmark")
+						.font(.system(size: 44))
+						.foregroundStyle(.green)
+					Text(L10n.format("IMPORT_MODE_MESSAGE", count))
+						.multilineTextAlignment(.center)
+					if isImporting {
+						ProgressView("IMPORT_CSV_SAVING")
+							.accessibilityIdentifier("csv-import-progress")
+					} else {
+						Button("IMPORT_APPEND") { onImport(.append) }
+							.buttonStyle(.borderedProminent)
+							.accessibilityIdentifier("csv-import-append")
+						Button("IMPORT_REPLACE", role: .destructive) { confirmingReplacement = true }
+							.buttonStyle(.bordered)
+							.accessibilityIdentifier("csv-import-replace")
+					}
+				}
+				.padding(24)
+			}
+			.navigationTitle("IMPORT_MODE_TITLE")
+			.navigationBarTitleDisplayMode(.inline)
+			.toolbar {
+				ToolbarItem(placement: .cancellationAction) {
+					Button("CANCEL") { dismiss() }
+						.disabled(isImporting)
+						.accessibilityIdentifier("csv-import-cancel")
+				}
+			}
+			.alert("IMPORT_REPLACE_TITLE", isPresented: $confirmingReplacement) {
+				Button("CANCEL", role: .cancel) {}
+				Button("IMPORT_REPLACE", role: .destructive) { onImport(.replace) }
+					.accessibilityIdentifier("csv-import-confirm-replace")
+			} message: {
+				Text(L10n.format("IMPORT_REPLACE_MESSAGE", count))
+			}
+			.alert(
+				"IMPORT_FAILURE_TITLE",
+				isPresented: Binding(
+					get: { saveError != nil },
+					set: { if !$0 { saveError = nil } }
+				)
+			) {
+				Button("OK", role: .cancel) { saveError = nil }
+			} message: {
+				Text(saveError ?? "")
+			}
+		}
+		.interactiveDismissDisabled(isImporting)
+	}
+}
+
+private enum CSVImportFileReader {
+	private enum ReadError: LocalizedError {
+		case unreadable
+		var errorDescription: String? { L10n.string("CSV_IMPORT_READ_ERROR") }
+	}
+
+	static func read(_ url: URL) throws -> CSVImportDocument {
+		let hasAccess = url.startAccessingSecurityScopedResource()
+		defer { if hasAccess { url.stopAccessingSecurityScopedResource() } }
+		var coordinationError: NSError?
+		var result: Result<CSVImportDocument, Error>?
+		NSFileCoordinator().coordinate(readingItemAt: url, options: .withoutChanges, error: &coordinationError) { coordinatedURL in
+			result = Result {
+				let data: Data
+				do {
+					data = try Data(contentsOf: coordinatedURL)
+				} catch {
+					throw ReadError.unreadable
+				}
+				return try CSVImporter.parse(data: data)
+			}
+		}
+		guard coordinationError == nil, let result else { throw ReadError.unreadable }
+		return try result.get()
+	}
+}
+
+private struct CSVShareItem: Identifiable {
+	let id = UUID()
+	let url: URL
+}
+
+private struct CSVShareSheet: UIViewControllerRepresentable {
+	let url: URL
+
+	func makeUIViewController(context: Context) -> UIActivityViewController {
+		UIActivityViewController(activityItems: [url], applicationActivities: nil)
+	}
+
+	func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+// MARK: - Setting icon view
 private struct SettingIconView: View {
 	let icon: String
 	let color: Color
